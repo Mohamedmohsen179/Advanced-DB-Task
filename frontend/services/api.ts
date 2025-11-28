@@ -11,6 +11,8 @@ import {
   UpdateDoctorRequest,
   CreateCourseRequest,
   UpdateCourseRequest,
+  CreateDepartmentRequest,
+  UpdateDepartmentRequest,
   PaginatedResponse,
   ApiResponse,
   PaginationParams,
@@ -411,20 +413,94 @@ class ApiService {
             success: true,
           } as T;
         }
+      } else if (method === 'POST') {
+        // Create course
+        const body = options.body ? JSON.parse(options.body as string) : {};
+        const newCourse: CourseWithSchedule = {
+          id: String(mockCourses.length + 1),
+          ...body,
+          enrolledStudents: 0,
+          status: 'active',
+          schedules: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        mockCourses.push(newCourse);
+        return { data: newCourse, success: true } as T;
+      } else if (method === 'DELETE') {
+        // Delete course
+        const courseId = endpoint.split('/').pop();
+        const index = mockCourses.findIndex(c => c.id === courseId);
+        if (index !== -1) {
+          mockCourses.splice(index, 1);
+          return { data: null, success: true } as T;
+        }
+        return { data: null, success: false, message: 'Course not found' } as T;
+      } else if (method === 'PUT') {
+        // Update course
+        const courseId = endpoint.split('/').pop();
+        const body = options.body ? JSON.parse(options.body as string) : {};
+        const index = mockCourses.findIndex(c => c.id === courseId);
+        if (index !== -1) {
+          mockCourses[index] = { ...mockCourses[index], ...body, updatedAt: new Date().toISOString() };
+          return { data: mockCourses[index], success: true } as T;
+        }
+        return { data: null, success: false, message: 'Course not found' } as T;
       }
     }
     
     if (endpoint.includes('/departments')) {
-      return {
-        data: mockDepartments,
-        pagination: {
-          page: 1,
-          limit: 10,
-          total: mockDepartments.length,
-          totalPages: 1,
-        },
-        success: true,
-      } as T;
+      if (method === 'GET') {
+        if (endpoint.match(/\/departments\/\d+$/)) {
+          const deptId = endpoint.split('/').pop();
+          const dept = mockDepartments.find(d => d.id === deptId);
+          return { data: dept, success: true } as T;
+        } else {
+          return {
+            data: mockDepartments,
+            pagination: {
+              page: 1,
+              limit: 10,
+              total: mockDepartments.length,
+              totalPages: 1,
+            },
+            success: true,
+          } as T;
+        }
+      } else if (method === 'POST') {
+        // Create department
+        const body = options.body ? JSON.parse(options.body as string) : {};
+        const newDept: Department = {
+          id: String(mockDepartments.length + 1),
+          ...body,
+          studentCount: 0,
+          facultyCount: 0,
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        mockDepartments.push(newDept);
+        return { data: newDept, success: true } as T;
+      } else if (method === 'DELETE') {
+        // Delete department
+        const deptId = endpoint.split('/').pop();
+        const index = mockDepartments.findIndex(d => d.id === deptId);
+        if (index !== -1) {
+          mockDepartments.splice(index, 1);
+          return { data: null, success: true } as T;
+        }
+        return { data: null, success: false, message: 'Department not found' } as T;
+      } else if (method === 'PUT') {
+        // Update department
+        const deptId = endpoint.split('/').pop();
+        const body = options.body ? JSON.parse(options.body as string) : {};
+        const index = mockDepartments.findIndex(d => d.id === deptId);
+        if (index !== -1) {
+          mockDepartments[index] = { ...mockDepartments[index], ...body, updatedAt: new Date().toISOString() };
+          return { data: mockDepartments[index], success: true } as T;
+        }
+        return { data: null, success: false, message: 'Department not found' } as T;
+      }
     }
     
     // Default response
@@ -531,6 +607,26 @@ class ApiService {
 
   async getDepartment(id: string): Promise<ApiResponse<Department>> {
     return this.request<ApiResponse<Department>>(`/departments/${id}`);
+  }
+
+  async createDepartment(data: CreateDepartmentRequest): Promise<ApiResponse<Department>> {
+    return this.request<ApiResponse<Department>>('/departments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateDepartment(id: string, data: UpdateDepartmentRequest): Promise<ApiResponse<Department>> {
+    return this.request<ApiResponse<Department>>(`/departments/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteDepartment(id: string): Promise<ApiResponse<void>> {
+    return this.request<ApiResponse<void>>(`/departments/${id}`, {
+      method: 'DELETE',
+    });
   }
 }
 

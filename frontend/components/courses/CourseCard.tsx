@@ -11,21 +11,6 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course, onEdit, onDelete }: CourseCardProps) {
-  const getStatusColor = (Level: string) => {
-    switch (Level) {
-      case 'Level 1':
-        return 'bg-green-100 text-green-800';
-      case 'Level 2':
-        return 'bg-gray-100 text-blue-800';
-      case 'Level 3':
-        return 'bg-red-100 text-yellow-800';
-      case 'Level 4':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const getSemesterColor = (semester: string) => {
     switch (semester) {
       case 'fall':
@@ -51,7 +36,7 @@ export default function CourseCard({ course, onEdit, onDelete }: CourseCardProps
             <p className="text-sm font-medium text-slate-500">{course.code}</p>
           </div>
           <div className="flex space-x-2">
-            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(course.status)}`}>
+            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${course.status === 'active' ? 'bg-green-100 text-green-800' : course.status === 'inactive' ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-800'}`}>
               {course.status}
             </span>
             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSemesterColor(course.semester)}`}>
