@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.DoctorRateAudits;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,94 +11,65 @@ namespace api.Controllers
     public class DoctorRateAuditsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public DoctorRateAuditsController(ApplicationDbContext context)
+        public DoctorRateAuditsController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/DoctorRateAudits
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DoctorRateAudit>>> GetDoctorRateAudits()
+        public async Task<ActionResult<IEnumerable<DoctorRateAuditReadDto>>> Get()
         {
-            return await _context.DoctorRateAudits.ToListAsync();
+            var items = await _context.DoctorRateAudits.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<DoctorRateAuditReadDto>>(items));
         }
 
-        // GET: api/DoctorRateAudits/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DoctorRateAudit>> GetDoctorRateAudit(int id)
+        public async Task<ActionResult<DoctorRateAuditReadDto>> GetById(int id)
         {
-            var doctorRateAudit = await _context.DoctorRateAudits.FindAsync(id);
-
-            if (doctorRateAudit == null)
-            {
+            var item = await _context.DoctorRateAudits.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return doctorRateAudit;
+            return Ok(_mapper.Map<DoctorRateAuditReadDto>(item));
         }
 
-        // PUT: api/DoctorRateAudits/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDoctorRateAudit(int id, DoctorRateAudit doctorRateAudit)
-        {
-            if (id != doctorRateAudit.AuditId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(doctorRateAudit).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DoctorRateAuditExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/DoctorRateAudits
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<DoctorRateAudit>> PostDoctorRateAudit(DoctorRateAudit doctorRateAudit)
+        public async Task<ActionResult<DoctorRateAuditReadDto>> Create(DoctorRateAuditCreateDto dto)
         {
-            _context.DoctorRateAudits.Add(doctorRateAudit);
+            var item = _mapper.Map<DoctorRateAudit>(dto);
+            _context.DoctorRateAudits.Add(item);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDoctorRateAudit", new { id = doctorRateAudit.AuditId }, doctorRateAudit);
+            return Ok(_mapper.Map<DoctorRateAuditReadDto>(item));
         }
 
-        // DELETE: api/DoctorRateAudits/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDoctorRateAudit(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, DoctorRateAuditUpdateDto dto)
         {
-            var doctorRateAudit = await _context.DoctorRateAudits.FindAsync(id);
-            if (doctorRateAudit == null)
-            {
+            var item = await _context.DoctorRateAudits.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.DoctorRateAudits.Remove(doctorRateAudit);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool DoctorRateAuditExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.DoctorRateAudits.Any(e => e.AuditId == id);
+            var item = await _context.DoctorRateAudits.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.DoctorRateAudits.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

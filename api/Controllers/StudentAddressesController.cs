@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.StudentAddresses;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,108 +11,65 @@ namespace api.Controllers
     public class StudentAddressesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public StudentAddressesController(ApplicationDbContext context)
+        public StudentAddressesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/StudentAddresses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StudentAddress>>> GetStudentAddresses()
+        public async Task<ActionResult<IEnumerable<StudentAddressReadDto>>> Get()
         {
-            return await _context.StudentAddresses.ToListAsync();
+            var items = await _context.StudentAddresses.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<StudentAddressReadDto>>(items));
         }
 
-        // GET: api/StudentAddresses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StudentAddress>> GetStudentAddress(int id)
+        public async Task<ActionResult<StudentAddressReadDto>> GetById(int id)
         {
-            var studentAddress = await _context.StudentAddresses.FindAsync(id);
-
-            if (studentAddress == null)
-            {
+            var item = await _context.StudentAddresses.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return studentAddress;
+            return Ok(_mapper.Map<StudentAddressReadDto>(item));
         }
 
-        // PUT: api/StudentAddresses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStudentAddress(int id, StudentAddress studentAddress)
-        {
-            if (id != studentAddress.StuId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(studentAddress).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StudentAddressExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/StudentAddresses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<StudentAddress>> PostStudentAddress(StudentAddress studentAddress)
+        public async Task<ActionResult<StudentAddressReadDto>> Create(StudentAddressCreateDto dto)
         {
-            _context.StudentAddresses.Add(studentAddress);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (StudentAddressExists(studentAddress.StuId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var item = _mapper.Map<StudentAddress>(dto);
+            _context.StudentAddresses.Add(item);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStudentAddress", new { id = studentAddress.StuId }, studentAddress);
+            return Ok(_mapper.Map<StudentAddressReadDto>(item));
         }
 
-        // DELETE: api/StudentAddresses/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStudentAddress(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, StudentAddressUpdateDto dto)
         {
-            var studentAddress = await _context.StudentAddresses.FindAsync(id);
-            if (studentAddress == null)
-            {
+            var item = await _context.StudentAddresses.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.StudentAddresses.Remove(studentAddress);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool StudentAddressExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.StudentAddresses.Any(e => e.StuId == id);
+            var item = await _context.StudentAddresses.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.StudentAddresses.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

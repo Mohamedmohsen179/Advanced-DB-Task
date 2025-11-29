@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.Teaches;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,108 +11,65 @@ namespace api.Controllers
     public class TeachesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TeachesController(ApplicationDbContext context)
+        public TeachesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Teaches
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Teach>>> GetTeaches()
+        public async Task<ActionResult<IEnumerable<TeachReadDto>>> Get()
         {
-            return await _context.Teaches.ToListAsync();
+            var items = await _context.Teaches.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<TeachReadDto>>(items));
         }
 
-        // GET: api/Teaches/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Teach>> GetTeach(int id)
+        public async Task<ActionResult<TeachReadDto>> GetById(int id)
         {
-            var teach = await _context.Teaches.FindAsync(id);
-
-            if (teach == null)
-            {
+            var item = await _context.Teaches.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return teach;
+            return Ok(_mapper.Map<TeachReadDto>(item));
         }
 
-        // PUT: api/Teaches/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeach(int id, Teach teach)
-        {
-            if (id != teach.CrsId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(teach).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TeachExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Teaches
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Teach>> PostTeach(Teach teach)
+        public async Task<ActionResult<TeachReadDto>> Create(TeachCreateDto dto)
         {
-            _context.Teaches.Add(teach);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (TeachExists(teach.CrsId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var item = _mapper.Map<Teach>(dto);
+            _context.Teaches.Add(item);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTeach", new { id = teach.CrsId }, teach);
+            return Ok(_mapper.Map<TeachReadDto>(item));
         }
 
-        // DELETE: api/Teaches/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeach(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, TeachUpdateDto dto)
         {
-            var teach = await _context.Teaches.FindAsync(id);
-            if (teach == null)
-            {
+            var item = await _context.Teaches.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.Teaches.Remove(teach);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TeachExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.Teaches.Any(e => e.CrsId == id);
+            var item = await _context.Teaches.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.Teaches.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

@@ -1,121 +1,75 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.Students;
+using AutoMapper;
 
-namespace api
+namespace api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class StudentsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public StudentsController(ApplicationDbContext context)
+        public StudentsController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Students
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
+        public async Task<ActionResult<IEnumerable<StudentReadDto>>> Get()
         {
-            return await _context.Students.ToListAsync();
+            var items = await _context.Students.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<StudentReadDto>>(items));
         }
 
-        // GET: api/Students/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Student>> GetStudent(int id)
+        public async Task<ActionResult<StudentReadDto>> GetById(int id)
         {
-            var student = await _context.Students.FindAsync(id);
-
-            if (student == null)
-            {
+            var item = await _context.Students.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return student;
+            return Ok(_mapper.Map<StudentReadDto>(item));
         }
 
-        // PUT: api/Students/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStudent(int id, Student student)
-        {
-            if (id != student.StuId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(student).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StudentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Students
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Student>> PostStudent(Student student)
+        public async Task<ActionResult<StudentReadDto>> Create(StudentCreateDto dto)
         {
-            _context.Students.Add(student);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (StudentExists(student.StuId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var item = _mapper.Map<Student>(dto);
+            _context.Students.Add(item);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStudent", new { id = student.StuId }, student);
+            return Ok(_mapper.Map<StudentReadDto>(item));
         }
 
-        // DELETE: api/Students/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStudent(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, StudentUpdateDto dto)
         {
-            var student = await _context.Students.FindAsync(id);
-            if (student == null)
-            {
+            var item = await _context.Students.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.Students.Remove(student);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool StudentExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.Students.Any(e => e.StuId == id);
+            var item = await _context.Students.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.Students.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

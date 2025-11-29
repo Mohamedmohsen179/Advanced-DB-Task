@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.Departements;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,108 +11,65 @@ namespace api.Controllers
     public class DepartementsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public DepartementsController(ApplicationDbContext context)
+        public DepartementsController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Departements
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Departement>>> GetDepartements()
+        public async Task<ActionResult<IEnumerable<DepartementReadDto>>> Get()
         {
-            return await _context.Departements.ToListAsync();
+            var items = await _context.Departements.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<DepartementReadDto>>(items));
         }
 
-        // GET: api/Departements/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Departement>> GetDepartement(int id)
+        public async Task<ActionResult<DepartementReadDto>> GetById(int id)
         {
-            var departement = await _context.Departements.FindAsync(id);
-
-            if (departement == null)
-            {
+            var item = await _context.Departements.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return departement;
+            return Ok(_mapper.Map<DepartementReadDto>(item));
         }
 
-        // PUT: api/Departements/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDepartement(int id, Departement departement)
-        {
-            if (id != departement.DeptId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(departement).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DepartementExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Departements
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Departement>> PostDepartement(Departement departement)
+        public async Task<ActionResult<DepartementReadDto>> Create(DepartementCreateDto dto)
         {
-            _context.Departements.Add(departement);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (DepartementExists(departement.DeptId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var item = _mapper.Map<Departement>(dto);
+            _context.Departements.Add(item);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDepartement", new { id = departement.DeptId }, departement);
+            return Ok(_mapper.Map<DepartementReadDto>(item));
         }
 
-        // DELETE: api/Departements/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDepartement(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, DepartementUpdateDto dto)
         {
-            var departement = await _context.Departements.FindAsync(id);
-            if (departement == null)
-            {
+            var item = await _context.Departements.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.Departements.Remove(departement);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool DepartementExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.Departements.Any(e => e.DeptId == id);
+            var item = await _context.Departements.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.Departements.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

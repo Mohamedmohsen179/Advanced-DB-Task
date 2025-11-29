@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.CourseSchedules;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,94 +11,65 @@ namespace api.Controllers
     public class CourseSchedulesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public CourseSchedulesController(ApplicationDbContext context)
+        public CourseSchedulesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/CourseSchedules
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseSchedule>>> GetCourseSchedules()
+        public async Task<ActionResult<IEnumerable<CourseScheduleReadDto>>> Get()
         {
-            return await _context.CourseSchedules.ToListAsync();
+            var items = await _context.CourseSchedules.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<CourseScheduleReadDto>>(items));
         }
 
-        // GET: api/CourseSchedules/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseSchedule>> GetCourseSchedule(int id)
+        public async Task<ActionResult<CourseScheduleReadDto>> GetById(int id)
         {
-            var courseSchedule = await _context.CourseSchedules.FindAsync(id);
-
-            if (courseSchedule == null)
-            {
+            var item = await _context.CourseSchedules.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return courseSchedule;
+            return Ok(_mapper.Map<CourseScheduleReadDto>(item));
         }
 
-        // PUT: api/CourseSchedules/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourseSchedule(int id, CourseSchedule courseSchedule)
-        {
-            if (id != courseSchedule.SchId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(courseSchedule).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CourseScheduleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/CourseSchedules
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CourseSchedule>> PostCourseSchedule(CourseSchedule courseSchedule)
+        public async Task<ActionResult<CourseScheduleReadDto>> Create(CourseScheduleCreateDto dto)
         {
-            _context.CourseSchedules.Add(courseSchedule);
+            var item = _mapper.Map<CourseSchedule>(dto);
+            _context.CourseSchedules.Add(item);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCourseSchedule", new { id = courseSchedule.SchId }, courseSchedule);
+            return Ok(_mapper.Map<CourseScheduleReadDto>(item));
         }
 
-        // DELETE: api/CourseSchedules/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourseSchedule(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, CourseScheduleUpdateDto dto)
         {
-            var courseSchedule = await _context.CourseSchedules.FindAsync(id);
-            if (courseSchedule == null)
-            {
+            var item = await _context.CourseSchedules.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.CourseSchedules.Remove(courseSchedule);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CourseScheduleExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.CourseSchedules.Any(e => e.SchId == id);
+            var item = await _context.CourseSchedules.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.CourseSchedules.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

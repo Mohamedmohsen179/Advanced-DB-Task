@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.Enrollements;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,108 +11,65 @@ namespace api.Controllers
     public class EnrollementsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public EnrollementsController(ApplicationDbContext context)
+        public EnrollementsController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Enrollements
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Enrollement>>> GetEnrollements()
+        public async Task<ActionResult<IEnumerable<EnrollementReadDto>>> Get()
         {
-            return await _context.Enrollements.ToListAsync();
+            var items = await _context.Enrollements.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<EnrollementReadDto>>(items));
         }
 
-        // GET: api/Enrollements/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Enrollement>> GetEnrollement(int id)
+        public async Task<ActionResult<EnrollementReadDto>> GetById(int id)
         {
-            var enrollement = await _context.Enrollements.FindAsync(id);
-
-            if (enrollement == null)
-            {
+            var item = await _context.Enrollements.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return enrollement;
+            return Ok(_mapper.Map<EnrollementReadDto>(item));
         }
 
-        // PUT: api/Enrollements/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEnrollement(int id, Enrollement enrollement)
-        {
-            if (id != enrollement.StuId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(enrollement).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EnrollementExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Enrollements
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Enrollement>> PostEnrollement(Enrollement enrollement)
+        public async Task<ActionResult<EnrollementReadDto>> Create(EnrollementCreateDto dto)
         {
-            _context.Enrollements.Add(enrollement);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (EnrollementExists(enrollement.StuId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var item = _mapper.Map<Enrollement>(dto);
+            _context.Enrollements.Add(item);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEnrollement", new { id = enrollement.StuId }, enrollement);
+            return Ok(_mapper.Map<EnrollementReadDto>(item));
         }
 
-        // DELETE: api/Enrollements/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEnrollement(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, EnrollementUpdateDto dto)
         {
-            var enrollement = await _context.Enrollements.FindAsync(id);
-            if (enrollement == null)
-            {
+            var item = await _context.Enrollements.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.Enrollements.Remove(enrollement);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool EnrollementExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.Enrollements.Any(e => e.StuId == id);
+            var item = await _context.Enrollements.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.Enrollements.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

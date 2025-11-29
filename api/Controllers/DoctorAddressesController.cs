@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.DoctorAddresses;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,108 +11,65 @@ namespace api.Controllers
     public class DoctorAddressesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public DoctorAddressesController(ApplicationDbContext context)
+        public DoctorAddressesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/DoctorAddresses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DoctorAddress>>> GetDoctorAddresses()
+        public async Task<ActionResult<IEnumerable<DoctorAddressReadDto>>> Get()
         {
-            return await _context.DoctorAddresses.ToListAsync();
+            var items = await _context.DoctorAddresses.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<DoctorAddressReadDto>>(items));
         }
 
-        // GET: api/DoctorAddresses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DoctorAddress>> GetDoctorAddress(int id)
+        public async Task<ActionResult<DoctorAddressReadDto>> GetById(int id)
         {
-            var doctorAddress = await _context.DoctorAddresses.FindAsync(id);
-
-            if (doctorAddress == null)
-            {
+            var item = await _context.DoctorAddresses.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return doctorAddress;
+            return Ok(_mapper.Map<DoctorAddressReadDto>(item));
         }
 
-        // PUT: api/DoctorAddresses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDoctorAddress(int id, DoctorAddress doctorAddress)
-        {
-            if (id != doctorAddress.DocId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(doctorAddress).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DoctorAddressExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/DoctorAddresses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<DoctorAddress>> PostDoctorAddress(DoctorAddress doctorAddress)
+        public async Task<ActionResult<DoctorAddressReadDto>> Create(DoctorAddressCreateDto dto)
         {
-            _context.DoctorAddresses.Add(doctorAddress);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (DoctorAddressExists(doctorAddress.DocId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var item = _mapper.Map<DoctorAddress>(dto);
+            _context.DoctorAddresses.Add(item);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDoctorAddress", new { id = doctorAddress.DocId }, doctorAddress);
+            return Ok(_mapper.Map<DoctorAddressReadDto>(item));
         }
 
-        // DELETE: api/DoctorAddresses/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDoctorAddress(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, DoctorAddressUpdateDto dto)
         {
-            var doctorAddress = await _context.DoctorAddresses.FindAsync(id);
-            if (doctorAddress == null)
-            {
+            var item = await _context.DoctorAddresses.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.DoctorAddresses.Remove(doctorAddress);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool DoctorAddressExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.DoctorAddresses.Any(e => e.DocId == id);
+            var item = await _context.DoctorAddresses.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.DoctorAddresses.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

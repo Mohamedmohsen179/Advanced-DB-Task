@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.DTOs.Courses;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -14,94 +11,65 @@ namespace api.Controllers
     public class CoursesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public CoursesController(ApplicationDbContext context)
+        public CoursesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
+        public async Task<ActionResult<IEnumerable<CourseReadDto>>> Get()
         {
-            return await _context.Courses.ToListAsync();
+            var items = await _context.Courses.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<CourseReadDto>>(items));
         }
 
-        // GET: api/Courses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Course>> GetCourse(int id)
+        public async Task<ActionResult<CourseReadDto>> GetById(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
-
-            if (course == null)
-            {
+            var item = await _context.Courses.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            return course;
+            return Ok(_mapper.Map<CourseReadDto>(item));
         }
 
-        // PUT: api/Courses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(int id, Course course)
-        {
-            if (id != course.CrsId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(course).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CourseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Courses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Course>> PostCourse(Course course)
+        public async Task<ActionResult<CourseReadDto>> Create(CourseCreateDto dto)
         {
-            _context.Courses.Add(course);
+            var item = _mapper.Map<Course>(dto);
+            _context.Courses.Add(item);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCourse", new { id = course.CrsId }, course);
+            return Ok(_mapper.Map<CourseReadDto>(item));
         }
 
-        // DELETE: api/Courses/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, CourseUpdateDto dto)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
-            {
+            var item = await _context.Courses.FindAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            _context.Courses.Remove(course);
+            _mapper.Map(dto, item);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CourseExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            return _context.Courses.Any(e => e.CrsId == id);
+            var item = await _context.Courses.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.Courses.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
