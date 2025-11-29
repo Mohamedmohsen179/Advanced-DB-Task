@@ -933,33 +933,41 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // API Service Class
 class ApiService {
-  private baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  // Backend API base URL (ASP.NET Core)
+  // Configure via NEXT_PUBLIC_API_URL, e.g. "https://localhost:7252/api"
+  // Defaults are aligned with api/Properties/launchSettings.json
+  private baseUrl =
+    process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7252/api';
+
+  // Toggle between real API and mock data
+  private useMocks = process.env.NEXT_PUBLIC_USE_MOCK_API === 'true';
 
   // Generic request method (for future real API integration)
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    // For now, we'll use mock data, but this structure is ready for real API
-    await delay(500); // Simulate network delay
-    
-    // This is where real API calls would go:
-    // const response = await fetch(`${this.baseUrl}${endpoint}`, {
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     ...options.headers,
-    //   },
-    //   ...options,
-    // });
-    // 
-    // if (!response.ok) {
-    //   throw new Error(`API Error: ${response.statusText}`);
-    // }
-    // 
-    // return response.json();
-    
-    // For now, return mock data based on endpoint
-    return this.getMockData<T>(endpoint, options);
+    // When using mocks, keep current behavior
+    if (this.useMocks) {
+      await delay(500); // Simulate network delay
+      return this.getMockData<T>(endpoint, options);
+    }
+
+    // Real API call to ASP.NET Core backend
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+      ...options,
+    });
+
+    if (!response.ok) {
+      const message = await response.text().catch(() => response.statusText);
+      throw new Error(`API Error ${response.status}: ${message}`);
+    }
+
+    return response.json() as Promise<T>;
   }
 
   private getMockData<T>(endpoint: string, options: RequestInit): T {

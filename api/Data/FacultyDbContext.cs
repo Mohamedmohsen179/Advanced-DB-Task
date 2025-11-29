@@ -73,11 +73,12 @@ namespace api.Data
                 .HasForeignKey(c => c.Doc_ID)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            // Course -> Department can NOT use Cascade in SQL Server because of multiple cascade paths
             modelBuilder.Entity<Course>()
                 .HasOne(c => c.Department)
                 .WithMany(d => d.Courses)
                 .HasForeignKey(c => c.Dept_ID)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Configure computed columns
             modelBuilder.Entity<Doctor>()
