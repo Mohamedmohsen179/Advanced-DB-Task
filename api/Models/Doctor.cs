@@ -1,69 +1,49 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace api.Models
+namespace api.Models;
+
+public partial class Doctor
 {
-    [Table("Doctor", Schema = "Faculty")]
-    public class Doctor
-    {
-        [Key]
-        public int Doc_ID { get; set; }
+    public int DocId { get; set; }
 
-        [Required]
-        [StringLength(14)]
-        public string SSN { get; set; } = string.Empty;
+    public string Ssn { get; set; } = null!;
 
-        [Required]
-        [StringLength(50)]
-        public string FName { get; set; } = string.Empty;
+    public string Fname { get; set; } = null!;
 
-        [Required]
-        [StringLength(50)]
-        public string LName { get; set; } = string.Empty;
+    public string Lname { get; set; } = null!;
 
-        [Required]
-        [StringLength(100)]
-        public string Email { get; set; } = string.Empty;
+    public string Email { get; set; } = null!;
 
-        [Required]
-        [StringLength(50)]
-        public string Username { get; set; } = string.Empty;
+    public string Username { get; set; } = null!;
 
-        [Required]
-        [StringLength(10)]
-        public string Password { get; set; } = string.Empty;
+    public string Password { get; set; } = null!;
 
-        public DateTime Hire_Date { get; set; }
+    public DateOnly? HireDate { get; set; }
 
-        public DateTime DOB { get; set; }
+    public DateOnly? Dob { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public int? Age { get; set; }
+    public int? Age { get; set; }
 
-        [Required]
-        [StringLength(1)]
-        public string Gender { get; set; } = string.Empty;
+    public string? Gender { get; set; }
 
-        [Required]
-        public int Hour_Rate { get; set; }
+    public int? HourRate { get; set; }
 
-        [Required]
-        public int Hours_Per_Week { get; set; }
+    public int? HoursPerWeek { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public int? Salary { get; set; }
+    public int? Salary { get; set; }
 
-        [Required]
-        public int Dept_ID { get; set; }
+    public int DeptId { get; set; }
 
-        // Navigation properties
-        [ForeignKey("Dept_ID")]
-        public virtual Department? Department { get; set; }
+    public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
 
-        public virtual ICollection<DoctorPhone> Phones { get; set; } = new List<DoctorPhone>();
-        public virtual ICollection<DoctorAddress> Addresses { get; set; } = new List<DoctorAddress>();
-        public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
-        public virtual ICollection<Teach> TeachingAssignments { get; set; } = new List<Teach>();
-    }
+    public virtual ICollection<Departement> Departements { get; set; } = new List<Departement>();
+
+    public virtual Departement Dept { get; set; } = null!;
+
+    public virtual ICollection<DoctorAddress> DoctorAddresses { get; set; } = new List<DoctorAddress>();
+
+    public virtual ICollection<DoctorPhone> DoctorPhones { get; set; } = new List<DoctorPhone>();
+
+    public virtual ICollection<Teach> Teaches { get; set; } = new List<Teach>();
 }
-

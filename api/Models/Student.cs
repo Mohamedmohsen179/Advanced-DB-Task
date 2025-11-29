@@ -1,65 +1,41 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace api.Models
+namespace api.Models;
+
+public partial class Student
 {
-    [Table("Student", Schema = "Faculty")]
-    public class Student
-    {
-        [Key]
-        public int Stu_ID { get; set; }
+    public int StuId { get; set; }
 
-        [Required]
-        [StringLength(14)]
-        public string Stu_SSN { get; set; } = string.Empty;
+    public string StuSsn { get; set; } = null!;
 
-        [Required]
-        [StringLength(50)]
-        public string FName { get; set; } = string.Empty;
+    public string Fname { get; set; } = null!;
 
-        [Required]
-        [StringLength(50)]
-        public string LName { get; set; } = string.Empty;
+    public string Lname { get; set; } = null!;
 
-        [Required]
-        [StringLength(100)]
-        public string Email { get; set; } = string.Empty;
+    public string Email { get; set; } = null!;
 
-        [Required]
-        [StringLength(50)]
-        public string Username { get; set; } = string.Empty;
+    public string Username { get; set; } = null!;
 
-        [Required]
-        [StringLength(255)]
-        public string Password { get; set; } = string.Empty;
+    public string Password { get; set; } = null!;
 
-        [Required]
-        [StringLength(1)]
-        public string Gender { get; set; } = string.Empty;
+    public string? Gender { get; set; }
 
-        [Required]
-        [Range(1, 4)]
-        public int Level { get; set; }
+    public int? Level { get; set; }
 
-        public DateTime DOB { get; set; }
+    public DateOnly? Dob { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public int? Age { get; set; }
+    public int? Age { get; set; }
 
-        [Required]
-        [Column(TypeName = "decimal(3,2)")]
-        public decimal CGPA { get; set; }
+    public decimal? Cgpa { get; set; }
 
-        [Required]
-        public int Dept_ID { get; set; }
+    public int DeptId { get; set; }
 
-        // Navigation properties
-        [ForeignKey("Dept_ID")]
-        public virtual Department? Department { get; set; }
+    public virtual Departement Dept { get; set; } = null!;
 
-        public virtual ICollection<StudentPhone> Phones { get; set; } = new List<StudentPhone>();
-        public virtual ICollection<StudentAddress> Addresses { get; set; } = new List<StudentAddress>();
-        public virtual ICollection<Enrollement> Enrollments { get; set; } = new List<Enrollement>();
-    }
+    public virtual ICollection<Enrollement> Enrollements { get; set; } = new List<Enrollement>();
+
+    public virtual ICollection<StudentAddress> StudentAddresses { get; set; } = new List<StudentAddress>();
+
+    public virtual ICollection<StudentPhone> StudentPhones { get; set; } = new List<StudentPhone>();
 }
-

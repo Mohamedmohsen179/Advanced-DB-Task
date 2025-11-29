@@ -1,28 +1,17 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace api.Models
+namespace api.Models;
+
+public partial class Teach
 {
-    [Table("Teach", Schema = "Faculty")]
-    public class Teach
-    {
-        [Key, Column(Order = 0)]
-        public int Crs_ID { get; set; }
+    public int CrsId { get; set; }
 
-        [Key, Column(Order = 1)]
-        public int Doc_ID { get; set; }
+    public int DocId { get; set; }
 
-        [Key, Column(Order = 2)]
-        [Required]
-        [StringLength(50)]
-        public string Semester { get; set; } = string.Empty;
+    public string Semester { get; set; } = null!;
 
-        // Navigation properties
-        [ForeignKey("Crs_ID")]
-        public virtual Course? Course { get; set; }
+    public virtual Course Crs { get; set; } = null!;
 
-        [ForeignKey("Doc_ID")]
-        public virtual Doctor? Doctor { get; set; }
-    }
+    public virtual Doctor Doc { get; set; } = null!;
 }
-

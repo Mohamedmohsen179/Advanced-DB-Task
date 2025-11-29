@@ -934,12 +934,14 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 // API Service Class
 class ApiService {
   // Backend API base URL (ASP.NET Core)
-  // Configure via NEXT_PUBLIC_API_URL, e.g. "https://localhost:7252/api"
+  // Configure via NEXT_PUBLIC_API_URL, e.g. "http://localhost:5098/api" or "https://localhost:7252/api"
+  // Defaults to HTTP for local development to avoid SSL certificate issues
   // Defaults are aligned with api/Properties/launchSettings.json
   private baseUrl =
-    process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7252/api';
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5098/api';
 
   // Toggle between real API and mock data
+  // Set NEXT_PUBLIC_USE_MOCK_API=true to use mock data, otherwise uses real API
   private useMocks = process.env.NEXT_PUBLIC_USE_MOCK_API === 'true';
 
   // Generic request method (for future real API integration)
@@ -954,20 +956,81 @@ class ApiService {
     }
 
     // Real API call to ASP.NET Core backend
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-      },
-      ...options,
-    });
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+        },
+        ...options,
+      });
 
-    if (!response.ok) {
-      const message = await response.text().catch(() => response.statusText);
-      throw new Error(`API Error ${response.status}: ${message}`);
+      if (!response.ok) {
+        let errorMessage = response.statusText;
+        let errorDetails: Record<string, unknown> | null = null;
+        
+        try {
+          const errorData = await response.json() as Record<string, unknown>;
+          errorDetails = errorData;
+          
+          // Handle ASP.NET Core validation errors
+          if (errorData.errors && typeof errorData.errors === 'object') {
+            // ModelState errors from ASP.NET Core
+            const validationErrors: string[] = [];
+            Object.keys(errorData.errors).forEach(key => {
+              const messages = (errorData.errors as Record<string, unknown>)[key];
+              if (Array.isArray(messages)) {
+                validationErrors.push(...messages.map(m => String(m)));
+              } else if (messages) {
+                validationErrors.push(String(messages));
+              }
+            });
+            errorMessage = validationErrors.join(', ') || 
+                          (errorData.title ? String(errorData.title) : '') || 
+                          errorMessage;
+          } else {
+            errorMessage = (errorData.message ? String(errorData.message) : '') ||
+                          (errorData.error ? String(errorData.error) : '') ||
+                          (errorData.title ? String(errorData.title) : '') ||
+                          errorMessage;
+          }
+        } catch {
+          // If response is not JSON, try to get text
+          try {
+            const text = await response.text();
+            if (text) {
+              errorMessage = text;
+            }
+          } catch {
+            // Use default status text
+          }
+        }
+        
+        // Create error object with more details
+        const apiError = new Error(errorMessage) as Error & { status?: number; details?: Record<string, unknown> };
+        apiError.status = response.status;
+        apiError.details = errorDetails || undefined;
+        throw apiError;
+      }
+
+      return response.json() as Promise<T>;
+    } catch (error) {
+      // Handle network errors (e.g., API server not running, CORS, SSL issues)
+      if (error instanceof TypeError) {
+        if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
+          throw new Error(
+            `Unable to connect to API server at ${this.baseUrl}. ` +
+            `Please ensure:\n` +
+            `1. The backend API is running\n` +
+            `2. The API URL is correct (currently: ${this.baseUrl})\n` +
+            `3. CORS is properly configured\n` +
+            `4. If using HTTPS, the certificate is trusted\n\n` +
+            `You can set NEXT_PUBLIC_USE_MOCK_API=true to use mock data instead.`
+          );
+        }
+      }
+      throw error;
     }
-
-    return response.json() as Promise<T>;
   }
 
   private getMockData<T>(endpoint: string, options: RequestInit): T {

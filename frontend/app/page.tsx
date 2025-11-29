@@ -16,6 +16,7 @@ export default function Home() {
   });
   const [recentStudents, setRecentStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadDashboardData();
@@ -24,8 +25,9 @@ export default function Home() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      setError(null);
 
-      // Load all data in parallel
+      // Load all data in parallel from the API
       const [studentsResponse, doctorsResponse, coursesResponse] = await Promise.all([
         apiService.getStudents(),
         apiService.getDoctors(),
@@ -33,18 +35,33 @@ export default function Home() {
       ]);
 
       if (studentsResponse.success && doctorsResponse.success && coursesResponse.success) {
+        // Extract data arrays from responses
+        const students = Array.isArray(studentsResponse.data) ? studentsResponse.data : [];
+        const doctors = Array.isArray(doctorsResponse.data) ? doctorsResponse.data : [];
+        const courses = Array.isArray(coursesResponse.data) ? coursesResponse.data : [];
+
         setStats({
-          studentsCount: studentsResponse.data.length,
-          doctorsCount: doctorsResponse.data.length,
-          coursesCount: coursesResponse.data.length,
-          activeCoursesCount: coursesResponse.data.filter((course: CourseWithSchedule) => course.schedules && course.schedules.length > 0).length,
+          studentsCount: students.length,
+          doctorsCount: doctors.length,
+          coursesCount: courses.length,
+          activeCoursesCount: courses.filter((course: CourseWithSchedule) => 
+            course.schedules && course.schedules.length > 0
+          ).length,
         });
 
         // Get recent students (last 3)
-        setRecentStudents(studentsResponse.data.slice(0, 3));
+        setRecentStudents(students.slice(0, 3));
+      } else {
+        // Handle API response errors
+        const errors = [];
+        if (!studentsResponse.success) errors.push('Failed to load students');
+        if (!doctorsResponse.success) errors.push('Failed to load doctors');
+        if (!coursesResponse.success) errors.push('Failed to load courses');
+        setError(errors.join(', '));
       }
     } catch (err) {
       console.error('Error loading dashboard data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard data. Please ensure the API server is running.');
     } finally {
       setLoading(false);
     }
@@ -55,6 +72,41 @@ export default function Home() {
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         <span className="ml-2 text-gray-600">Loading dashboard...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <span className="text-red-600 text-xl">⚠️</span>
+            </div>
+            <div className="ml-3 flex-1">
+              <h3 className="text-sm font-medium text-red-800">Error Loading Dashboard</h3>
+              <div className="text-sm text-red-700 mt-1 whitespace-pre-line">{error}</div>
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={loadDashboardData}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => {
+                    // Reload page to reset state
+                    window.location.reload();
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-red-800 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  Reload Page
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

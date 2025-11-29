@@ -1,27 +1,15 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace api.Models
+namespace api.Models;
+
+public partial class DoctorAddress
 {
-    [Table("Doctor_Address", Schema = "Faculty")]
-    public class DoctorAddress
-    {
-        [Key, Column(Order = 0)]
-        public int Doc_ID { get; set; }
+    public int DocId { get; set; }
 
-        [Key, Column(Order = 1)]
-        [Required]
-        [StringLength(50)]
-        public string City { get; set; } = string.Empty;
+    public string City { get; set; } = null!;
 
-        [Key, Column(Order = 2)]
-        [Required]
-        [StringLength(50)]
-        public string Street { get; set; } = string.Empty;
+    public string Street { get; set; } = null!;
 
-        // Navigation properties
-        [ForeignKey("Doc_ID")]
-        public virtual Doctor? Doctor { get; set; }
-    }
+    public virtual Doctor Doc { get; set; } = null!;
 }
-

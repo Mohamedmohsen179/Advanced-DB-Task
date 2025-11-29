@@ -1,44 +1,29 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace api.Models
+namespace api.Models;
+
+public partial class Course
 {
-    [Table("Course", Schema = "Faculty")]
-    public class Course
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Crs_ID { get; set; }
+    public int CrsId { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string Crs_Name { get; set; } = string.Empty;
+    public string CrsName { get; set; } = null!;
 
-        [Required]
-        [StringLength(500)]
-        public string Discription { get; set; } = string.Empty;
+    public string Discription { get; set; } = null!;
 
-        [Required]
-        public int Credit_Hours { get; set; }
+    public int CreditHours { get; set; }
 
-        [Required]
-        public int Doc_ID { get; set; }
+    public int DocId { get; set; }
 
-        [Required]
-        public int Dept_ID { get; set; }
+    public int DeptId { get; set; }
 
-        public int? Max_Num_Stu { get; set; }
+    public virtual ICollection<CourseSchedule> CourseSchedules { get; set; } = new List<CourseSchedule>();
 
-        // Navigation properties
-        [ForeignKey("Doc_ID")]
-        public virtual Doctor? Instructor { get; set; }
+    public virtual Departement Dept { get; set; } = null!;
 
-        [ForeignKey("Dept_ID")]
-        public virtual Department? Department { get; set; }
+    public virtual Doctor Doc { get; set; } = null!;
 
-        public virtual ICollection<CourseSchedule> Schedules { get; set; } = new List<CourseSchedule>();
-        public virtual ICollection<Enrollement> Enrollments { get; set; } = new List<Enrollement>();
-        public virtual ICollection<Teach> TeachingAssignments { get; set; } = new List<Teach>();
-    }
+    public virtual ICollection<Enrollement> Enrollements { get; set; } = new List<Enrollement>();
+
+    public virtual ICollection<Teach> Teaches { get; set; } = new List<Teach>();
 }
-

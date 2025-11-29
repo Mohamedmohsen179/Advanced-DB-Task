@@ -1,37 +1,23 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace api.Models
+namespace api.Models;
+
+public partial class CourseSchedule
 {
-    [Table("Course_Schedule", Schema = "Faculty")]
-    public class CourseSchedule
-    {
-        [Key, Column(Order = 0)]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Sch_ID { get; set; }
+    public int SchId { get; set; }
 
-        [Key, Column(Order = 1)]
-        public int Crs_ID { get; set; }
+    public int CrsId { get; set; }
 
-        [Required]
-        [StringLength(15)]
-        public string Day { get; set; } = string.Empty;
+    public string Day { get; set; } = null!;
 
-        [Required]
-        public TimeSpan Start_Hour { get; set; }
+    public TimeOnly StartHour { get; set; }
 
-        [Required]
-        public TimeSpan END_Hour { get; set; }
+    public TimeOnly EndHour { get; set; }
 
-        [Range(1, 4)]
-        public int? Level { get; set; }
+    public int? Level { get; set; }
 
-        [StringLength(100)]
-        public string? Location { get; set; }
+    public string? Location { get; set; }
 
-        // Navigation properties
-        [ForeignKey("Crs_ID")]
-        public virtual Course? Course { get; set; }
-    }
+    public virtual Course Crs { get; set; } = null!;
 }
-
