@@ -1,0 +1,22 @@
+{
+    "sourceFile": "types/Department.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1764374158682,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764374187052,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,4 +28,8 @@\n   email?: string;\n   website?: string;\n   budget?: number;\n }\n+\n+export interface UpdateDepartmentRequest extends Partial<CreateDepartmentRequest> {\n+  status?: 'active' | 'inactive';\n+}\n"
+                }
+            ],
+            "date": 1764374158682,
+            "name": "Commit-0",
+            "content": "export interface Department {\n  id: string;\n  name: string;\n  code: string;\n  description?: string;\n  headOfDepartmentId?: string;\n  establishedDate: string;\n  location?: string;\n  phoneNumber?: string;\n  email?: string;\n  website?: string;\n  budget?: number;\n  studentCount: number;\n  facultyCount: number;\n  status: 'active' | 'inactive';\n  createdAt: string;\n  updatedAt: string;\n}\n\nexport interface CreateDepartmentRequest {\n  name: string;\n  code: string;\n  description?: string;\n  headOfDepartmentId?: string;\n  establishedDate: string;\n  location?: string;\n  phoneNumber?: string;\n  email?: string;\n  website?: string;\n  budget?: number;\n}\n"
+        }
+    ]
+}

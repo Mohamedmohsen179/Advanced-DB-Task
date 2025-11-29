@@ -18,7 +18,7 @@ export default function DepartmentCard({ department, onEdit, onDelete }: Departm
         <div className="flex items-start justify-between mb-4">
           <div>
             <h3 className="text-lg font-bold text-slate-900">{department.name}</h3>
-            <p className="text-sm font-medium text-slate-500">{department.code}</p>
+            <p className="text-sm font-medium text-slate-500">{department.id}</p>
           </div>
         </div>
 
@@ -35,6 +35,14 @@ export default function DepartmentCard({ department, onEdit, onDelete }: Departm
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Doctors</span>
             <p className="text-sm font-semibold text-slate-900">{department.facultyCount}</p>
           </div>
+          {department.budget && (
+            <div className="col-span-2">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Head Doctor</span>
+              <p className="text-sm font-semibold text-slate-900">
+                ${department.budget.toLocaleString()}
+              </p>
+            </div>
+          )}
           {department.location && (
             <div className="col-span-2">
               <span className="text-xs font-medium text-gray-500">Location</span>

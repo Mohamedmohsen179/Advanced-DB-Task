@@ -22,7 +22,7 @@ export default function NewDepartmentPage() {
     location: '',
     phoneNumber: '',
     email: '',
-    website: ''
+    website: '',
   });
 
   useEffect(() => {

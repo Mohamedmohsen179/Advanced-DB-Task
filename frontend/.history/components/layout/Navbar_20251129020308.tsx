@@ -67,6 +67,7 @@ export default function Navbar() {
           </div>
         </div>
 
+        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-4 pt-4 pb-4 space-y-2 border-t border-slate-200 bg-slate-50/50">
@@ -90,14 +91,6 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Courses
-              </Link>
-
-              <Link
-                href="/departments"
-                className="text-slate-700 hover:text-slate-900 hover:bg-white block px-4 py-3 rounded-lg text-base font-semibold transition-all duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Departements
               </Link>
 
             </div>

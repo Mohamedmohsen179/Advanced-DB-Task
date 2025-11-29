@@ -223,6 +223,177 @@ export default function NewCoursePage() {
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
+
+              <div>
+                <label htmlFor="departmentId" className="block text-sm font-semibold text-slate-700">
+                  Department *
+                </label>
+                <select
+                  id="departmentId"
+                  name="departmentId"
+                  required
+                  value={formData.departmentId}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.code} - {dept.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="instructorId" className="block text-sm font-semibold text-slate-700">
+                  Instructor (Doctor) *
+                </label>
+                <select
+                  id="instructorId"
+                  name="instructorId"
+                  required
+                  value={formData.instructorId}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="">Select Instructor</option>
+                  {doctors.map(doctor => (
+                    <option key={doctor.id} value={doctor.id}>
+                      Dr. {doctor.firstName} {doctor.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="semester" className="block text-sm font-semibold text-slate-700">
+                  Semester *
+                </label>
+                <select
+                  id="semester"
+                  name="semester"
+                  required
+                  value={formData.semester}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="fall">Fall</option>
+                  <option value="spring">Spring</option>
+                  <option value="summer">Summer</option>
+                  <option value="winter">Winter</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="year" className="block text-sm font-semibold text-slate-700">
+                  Year *
+                </label>
+                <input
+                  type="number"
+                  id="year"
+                  name="year"
+                  required
+                  min="2020"
+                  max="2030"
+                  value={formData.year}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="startDate" className="block text-sm font-semibold text-slate-700">
+                  Start Date *
+                </label>
+                <input
+                  type="date"
+                  id="startDate"
+                  name="startDate"
+                  required
+                  value={formData.startDate}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="endDate" className="block text-sm font-semibold text-slate-700">
+                  End Date *
+                </label>
+                <input
+                  type="date"
+                  id="endDate"
+                  name="endDate"
+                  required
+                  value={formData.endDate}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label htmlFor="syllabus" className="block text-sm font-semibold text-slate-700">
+                  Syllabus
+                </label>
+                <textarea
+                  id="syllabus"
+                  name="syllabus"
+                  rows={4}
+                  value={formData.syllabus}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                  placeholder="Enter course syllabus..."
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Prerequisites
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={prerequisiteInput}
+                    onChange={(e) => setPrerequisiteInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addPrerequisite();
+                      }
+                    }}
+                    placeholder="Enter prerequisite course code"
+                    className="text-black flex-1 border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addPrerequisite}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Add
+                  </Button>
+                </div>
+                {formData.prerequisites && formData.prerequisites.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.prerequisites.map((prereq, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800"
+                      >
+                        {prereq}
+                        <button
+                          type="button"
+                          onClick={() => removePrerequisite(index)}
+                          className="ml-2 text-slate-500 hover:text-slate-700"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">

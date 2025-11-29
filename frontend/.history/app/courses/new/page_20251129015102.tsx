@@ -2,38 +2,63 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreateDepartmentRequest } from '../../../types';
+import { CreateCourseRequest } from '../../../types';
 import { apiService } from '../../../services/api';
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 
-export default function NewDepartmentPage() {
+export default function NewCoursePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<{ id: string; name: string; code: string }[]>([]);
   const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
 
-  const [formData, setFormData] = useState<CreateDepartmentRequest>({
+  const [formData, setFormData] = useState<CreateCourseRequest>({
     name: '',
     code: '',
     description: '',
-    headOfDepartmentId: '',
-    establishedDate: new Date().toISOString().split('T')[0],
-    location: '',
-    phoneNumber: '',
-    email: '',
-    website: ''
+    credits: 3,
+    departmentId: '',
+    instructorId: '',
+    semester: 'fall',
+    year: new Date().getFullYear(),
+    maxStudents: 30,
+    prerequisites: [],
+    syllabus: '',
+    startDate: '',
+    endDate: '',
   });
 
+  const [prerequisiteInput, setPrerequisiteInput] = useState('');
+
   useEffect(() => {
+    loadDepartments();
     loadDoctors();
   }, []);
+
+  const loadDepartments = async () => {
+    try {
+      const response = await apiService.getDepartments();
+      if (response.success && response.data.length > 0) {
+        setDepartments(response.data.map(d => ({ id: d.id, name: d.name, code: d.code })));
+        if (!formData.departmentId) {
+          setFormData(prev => ({ ...prev, departmentId: response.data[0].id }));
+        }
+      }
+    } catch (err) {
+      console.error('Error loading departments:', err);
+    }
+  };
 
   const loadDoctors = async () => {
     try {
       const response = await apiService.getDoctors();
-      if (response.success) {
+      if (response.success && response.data.length > 0) {
         setDoctors(response.data.map(d => ({ id: d.id, firstName: d.firstName, lastName: d.lastName })));
+        if (!formData.instructorId) {
+          setFormData(prev => ({ ...prev, instructorId: response.data[0].id }));
+        }
       }
     } catch (err) {
       console.error('Error loading doctors:', err);
@@ -41,6 +66,30 @@ export default function NewDepartmentPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'credits' || name === 'year' || name === 'maxStudents'
+        ? parseInt(value) || 0
+        : value,
+    }));
+  };
+
+  const addPrerequisite = () => {
+    if (prerequisiteInput.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        prerequisites: [...(prev.prerequisites || []), prerequisiteInput.trim()],
+      }));
+      setPrerequisiteInput('');
+    }
+  };
+
+  const removePrerequisite = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      prerequisites: prev.prerequisites?.filter((_, i) => i !== index) || [],
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,27 +98,27 @@ export default function NewDepartmentPage() {
     setError(null);
 
     try {
-      const response = await apiService.createDepartment(formData);
+      const response = await apiService.createCourse(formData);
 
       if (response.success) {
-        router.push('/departments');
+        router.push('/courses');
       } else {
-        setError('Failed to create the new Department');
+        setError('Failed to create course');
       }
     } catch (err) {
-      setError('An error occurred while creating the Department');
-      console.error('Error creating Department:', err);
+      setError('An error occurred while creating the course');
+      console.error('Error creating course:', err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900">Add New Department</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Add New Course</h1>
         <p className="mt-2 text-base text-slate-600">
-          Enter new Department information below
+          Enter New Course information below
         </p>
       </div>
 
@@ -93,14 +142,14 @@ export default function NewDepartmentPage() {
 
       <Card>
         <CardHeader>
-          <h2 className="text-lg font-semibold text-slate-900">Department Information</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Course Information</h2>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold text-slate-700">
-                  Department Name *
+                  Course Name *
                 </label>
                 <input
                   type="text"
@@ -115,7 +164,7 @@ export default function NewDepartmentPage() {
 
               <div>
                 <label htmlFor="code" className="block text-sm font-semibold text-slate-700">
-                  Department Code *
+                  Course Departement *
                 </label>
                 <input
                   type="text"
@@ -143,53 +192,60 @@ export default function NewDepartmentPage() {
               </div>
 
               <div>
-                <label htmlFor="establishedDate" className="block text-sm font-semibold text-slate-700">
-                  Established Date *
+                <label htmlFor="credits" className="block text-sm font-semibold text-slate-700">
+                  Credit Hours *
                 </label>
                 <input
-                  type="date"
-                  id="establishedDate"
-                  name="establishedDate"
+                  type="number"
+                  id="credits"
+                  name="credits"
                   required
-                  value={formData.establishedDate}
+                  min="1"
+                  max="6"
+                  value={formData.credits}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="location" className="block text-sm font-semibold text-slate-700">
-                  Location
+                <label htmlFor="maxStudents" className="block text-sm font-semibold text-slate-700">
+                  Max Students *
                 </label>
                 <input
-                  type="text"
-                  id="location"
-                  name="location"
-                  value={formData.location}
+                  type="number"
+                  id="maxStudents"
+                  name="maxStudents"
+                  required
+                  min="1"
+                  value={formData.maxStudents}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="headOfDepartmentId" className="block text-sm font-semibold text-slate-700">
-                Head of Department
-              </label>
-              <select
-                id="headOfDepartmentId"
-                name="headOfDepartmentId"
-                value={formData.headOfDepartmentId || ''}
-                onChange={handleInputChange}
-                className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-              >
-                <option value="">Select Head of Department</option>
-                {doctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>
-                    Dr. {doctor.firstName} {doctor.lastName}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label htmlFor="instructorId" className="block text-sm font-semibold text-slate-700">
+                  Instructor (Doctor) *
+                </label>
+                <select
+                  id="instructorId"
+                  name="instructorId"
+                  required
+                  value={formData.instructorId}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="">Select Instructor</option>
+                  {doctors.map(doctor => (
+                    <option key={doctor.id} value={doctor.id}>
+                      Dr. {doctor.firstName} {doctor.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+
             </div>
 
             <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">
@@ -204,7 +260,7 @@ export default function NewDepartmentPage() {
                 type="submit"
                 loading={loading}
               >
-                Create Department
+                Create Course
               </Button>
             </div>
           </form>
@@ -213,3 +269,4 @@ export default function NewDepartmentPage() {
     </div>
   );
 }
+

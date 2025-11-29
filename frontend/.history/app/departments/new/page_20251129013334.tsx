@@ -22,7 +22,8 @@ export default function NewDepartmentPage() {
     location: '',
     phoneNumber: '',
     email: '',
-    website: ''
+    website: '',
+    budget: undefined,
   });
 
   useEffect(() => {
@@ -213,3 +214,4 @@ export default function NewDepartmentPage() {
     </div>
   );
 }
+

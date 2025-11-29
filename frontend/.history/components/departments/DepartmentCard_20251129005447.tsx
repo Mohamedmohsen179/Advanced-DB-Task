@@ -35,10 +35,30 @@ export default function DepartmentCard({ department, onEdit, onDelete }: Departm
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Doctors</span>
             <p className="text-sm font-semibold text-slate-900">{department.facultyCount}</p>
           </div>
+          {department.budget && (
+            <div className="col-span-2">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Budget</span>
+              <p className="text-sm font-semibold text-slate-900">
+                ${department.budget.toLocaleString()}
+              </p>
+            </div>
+          )}
           {department.location && (
             <div className="col-span-2">
               <span className="text-xs font-medium text-gray-500">Location</span>
               <p className="text-sm text-gray-900">{department.location}</p>
+            </div>
+          )}
+          {department.email && (
+            <div className="col-span-2">
+              <span className="text-xs font-medium text-gray-500">Email</span>
+              <p className="text-sm text-gray-900">{department.email}</p>
+            </div>
+          )}
+          {department.phoneNumber && (
+            <div className="col-span-2">
+              <span className="text-xs font-medium text-gray-500">Phone</span>
+              <p className="text-sm text-gray-900">{department.phoneNumber}</p>
             </div>
           )}
         </div>
@@ -58,6 +78,7 @@ export default function DepartmentCard({ department, onEdit, onDelete }: Departm
             href={`/departments/${department.id}`}
             className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors duration-200"
           >
+            View Details
           </Link>
           <div className="flex space-x-2">
             {onEdit && (

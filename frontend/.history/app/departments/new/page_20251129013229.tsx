@@ -22,7 +22,8 @@ export default function NewDepartmentPage() {
     location: '',
     phoneNumber: '',
     email: '',
-    website: ''
+    website: '',
+    budget: undefined,
   });
 
   useEffect(() => {
@@ -142,54 +143,53 @@ export default function NewDepartmentPage() {
                 />
               </div>
 
-              <div>
-                <label htmlFor="establishedDate" className="block text-sm font-semibold text-slate-700">
-                  Established Date *
-                </label>
-                <input
-                  type="date"
-                  id="establishedDate"
-                  name="establishedDate"
-                  required
-                  value={formData.establishedDate}
-                  onChange={handleInputChange}
-                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-                />
+              {/* Head of Department - each doctor in a separate row */}
+              {doctors.map((doctor) => (
+                <div className="mb-4" key={doctor.id}>
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Head of Department
+                  </label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={`Dr. ${doctor.firstName} ${doctor.lastName}`}
+                    className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm bg-gray-100 shadow-sm"
+                  />
+                </div>
+              ))}
+
+              {/* Location and Established Date on the same row */}
+              <div className="flex gap-4 mb-4">
+                <div className="flex-1">
+                  <label htmlFor="location" className="block text-sm font-semibold text-slate-700">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <label htmlFor="establishedDate" className="block text-sm font-semibold text-slate-700">
+                    Established Date *
+                  </label>
+                  <input
+                    type="date"
+                    id="establishedDate"
+                    name="establishedDate"
+                    required
+                    value={formData.establishedDate}
+                    onChange={handleInputChange}
+                    className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="location" className="block text-sm font-semibold text-slate-700">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  id="location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="headOfDepartmentId" className="block text-sm font-semibold text-slate-700">
-                Head of Department
-              </label>
-              <select
-                id="headOfDepartmentId"
-                name="headOfDepartmentId"
-                value={formData.headOfDepartmentId || ''}
-                onChange={handleInputChange}
-                className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-              >
-                <option value="">Select Head of Department</option>
-                {doctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>
-                    Dr. {doctor.firstName} {doctor.lastName}
-                  </option>
-                ))}
-              </select>
             </div>
 
             <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">
@@ -213,3 +213,4 @@ export default function NewDepartmentPage() {
     </div>
   );
 }
+

@@ -16,6 +16,18 @@ CREATE TABLE Faculty.Departement
 	Doc_ID INT NOT NULL
 );
 
+ALTER TABLE Faculty.Departement
+ADD Establish_Date DATE NOT NULL
+    CONSTRAINT DF_Departement_EstablishDate DEFAULT getdate();
+
+ALTER TABLE faculty.Departement
+ADD Location varchar(50)
+
+ALTER TABLE faculty.Departement
+ADD Dept_Description varchar(200)
+
+ALTER TABLE faculty.Departement
+ADD Dept_Code varchar(20)
 
 CREATE TABLE Faculty.Doctor
 (
@@ -87,6 +99,10 @@ CREATE TABLE Faculty.Course
 );
 
 EXEC sp_rename 'Faculty.Course.Duration', 'Credit_Hours', 'COLUMN';
+
+
+ALTER TABLE Faculty.Course
+ADD Max_Num_Stu int ;
 
 
 CREATE TABLE Faculty.Course_Schedule

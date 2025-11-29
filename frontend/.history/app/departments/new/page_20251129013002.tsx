@@ -22,7 +22,8 @@ export default function NewDepartmentPage() {
     location: '',
     phoneNumber: '',
     email: '',
-    website: ''
+    website: '',
+    budget: undefined,
   });
 
   useEffect(() => {
@@ -143,6 +144,26 @@ export default function NewDepartmentPage() {
               </div>
 
               <div>
+                <label htmlFor="headOfDepartmentId" className="block text-sm font-semibold text-slate-700">
+                  Head of Department
+                </label>
+                <select
+                  id="headOfDepartmentId"
+                  name="headOfDepartmentId"
+                  value={formData.headOfDepartmentId || ''}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="">Select Head of Department</option>
+                  {doctors.map(doctor => (
+                    <option key={doctor.id} value={doctor.id}>
+                      Dr. {doctor.firstName} {doctor.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label htmlFor="establishedDate" className="block text-sm font-semibold text-slate-700">
                   Established Date *
                 </label>
@@ -172,26 +193,6 @@ export default function NewDepartmentPage() {
               </div>
             </div>
 
-            <div>
-              <label htmlFor="headOfDepartmentId" className="block text-sm font-semibold text-slate-700">
-                Head of Department
-              </label>
-              <select
-                id="headOfDepartmentId"
-                name="headOfDepartmentId"
-                value={formData.headOfDepartmentId || ''}
-                onChange={handleInputChange}
-                className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-              >
-                <option value="">Select Head of Department</option>
-                {doctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>
-                    Dr. {doctor.firstName} {doctor.lastName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">
               <Button
                 type="button"
@@ -213,3 +214,4 @@ export default function NewDepartmentPage() {
     </div>
   );
 }
+

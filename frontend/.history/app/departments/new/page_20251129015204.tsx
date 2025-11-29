@@ -22,7 +22,8 @@ export default function NewDepartmentPage() {
     location: '',
     phoneNumber: '',
     email: '',
-    website: ''
+    website: '',
+    budget: undefined,
   });
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function NewDepartmentPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    z
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,11 +56,11 @@ export default function NewDepartmentPage() {
       if (response.success) {
         router.push('/departments');
       } else {
-        setError('Failed to create the new Department');
+        setError('Failed to create department');
       }
     } catch (err) {
-      setError('An error occurred while creating the Department');
-      console.error('Error creating Department:', err);
+      setError('An error occurred while creating the department');
+      console.error('Error creating department:', err);
     } finally {
       setLoading(false);
     }
@@ -69,7 +71,7 @@ export default function NewDepartmentPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-slate-900">Add New Department</h1>
         <p className="mt-2 text-base text-slate-600">
-          Enter new Department information below
+          Enter the department information below
         </p>
       </div>
 
@@ -143,6 +145,26 @@ export default function NewDepartmentPage() {
               </div>
 
               <div>
+                <label htmlFor="headOfDepartmentId" className="block text-sm font-semibold text-slate-700">
+                  Head of Department
+                </label>
+                <select
+                  id="headOfDepartmentId"
+                  name="headOfDepartmentId"
+                  value={formData.headOfDepartmentId || ''}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="">Select Head of Department</option>
+                  {doctors.map(doctor => (
+                    <option key={doctor.id} value={doctor.id}>
+                      Dr. {doctor.firstName} {doctor.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label htmlFor="establishedDate" className="block text-sm font-semibold text-slate-700">
                   Established Date *
                 </label>
@@ -170,26 +192,65 @@ export default function NewDepartmentPage() {
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="headOfDepartmentId" className="block text-sm font-semibold text-slate-700">
-                Head of Department
-              </label>
-              <select
-                id="headOfDepartmentId"
-                name="headOfDepartmentId"
-                value={formData.headOfDepartmentId || ''}
-                onChange={handleInputChange}
-                className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-              >
-                <option value="">Select Head of Department</option>
-                {doctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>
-                    Dr. {doctor.firstName} {doctor.lastName}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label htmlFor="phoneNumber" className="block text-sm font-semibold text-slate-700">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-slate-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="website" className="block text-sm font-semibold text-slate-700">
+                  Website
+                </label>
+                <input
+                  type="url"
+                  id="website"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com"
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="budget" className="block text-sm font-semibold text-slate-700">
+                  Budget
+                </label>
+                <input
+                  type="number"
+                  id="budget"
+                  name="budget"
+                  min="0"
+                  step="0.01"
+                  value={formData.budget || ''}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
             </div>
 
             <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">
@@ -213,3 +274,4 @@ export default function NewDepartmentPage() {
     </div>
   );
 }
+

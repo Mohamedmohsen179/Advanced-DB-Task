@@ -35,10 +35,25 @@ export default function DepartmentCard({ department, onEdit, onDelete }: Departm
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Doctors</span>
             <p className="text-sm font-semibold text-slate-900">{department.facultyCount}</p>
           </div>
+          {department.budget && (
+            <div className="col-span-2">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Head Doctor</span>
+              <p className="text-sm font-semibold text-slate-900">
+                ${department.budget.toLocaleString()}
+              </p>
+            </div>
+          )}
           {department.location && (
             <div className="col-span-2">
               <span className="text-xs font-medium text-gray-500">Location</span>
               <p className="text-sm text-gray-900">{department.location}</p>
+            </div>
+          )}
+
+          {department.phoneNumber && (
+            <div className="col-span-2">
+              <span className="text-xs font-medium text-gray-500">Phone</span>
+              <p className="text-sm text-gray-900">{department.phoneNumber}</p>
             </div>
           )}
         </div>
