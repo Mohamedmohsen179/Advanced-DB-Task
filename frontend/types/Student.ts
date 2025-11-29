@@ -1,52 +1,55 @@
+// Student interface matching Faculty_System database schema
 export interface Student {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber?: string;
-  dateOfBirth: string;
-  enrollmentDate: string;
-  studentId: string;
-  departmentId: string;
-  address?: {
-    street?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-    country?: string;
-  };
-  status: 'active' | 'inactive' | 'graduated' | 'suspended';
-  gpa?: number;
-  createdAt: string;
-  updatedAt: string;
+  Stu_ID: number;
+  Stu_SSN: string;
+  FName: string;
+  LName: string;
+  Email: string;
+  Username: string;
+  Password: string;
+  Gender: 'M' | 'F';
+  Level: 1 | 2 | 3 | 4;
+  DOB: string;
+  Age?: number; // Computed field
+  CGPA: number;
+  Dept_ID: number;
+  // Related data
+  phones?: StudentPhone[];
+  addresses?: StudentAddress[];
+  enrollments?: StudentEnrollment[];
+}
+
+export interface StudentPhone {
+  Stu_ID: number;
+  Phone_NUM: string;
+}
+
+export interface StudentAddress {
+  Stu_ID: number;
+  City: string;
+  Street: string;
 }
 
 export interface CreateStudentRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber?: string;
-  dateOfBirth: string;
-  studentId: string;
-  departmentId: string;
-  address?: {
-    street?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-    country?: string;
-  };
+  Stu_ID: number;
+  Stu_SSN: string;
+  FName: string;
+  LName: string;
+  Email: string;
+  Username: string;
+  Password: string;
+  Gender: 'M' | 'F';
+  Level: 1 | 2 | 3 | 4;
+  DOB: string;
+  CGPA: number;
+  Dept_ID: number;
 }
 
-export interface UpdateStudentRequest extends Partial<CreateStudentRequest> {
-  status?: 'active' | 'inactive' | 'graduated' | 'suspended';
-  gpa?: number;
-}
+export interface UpdateStudentRequest extends Partial<CreateStudentRequest> {}
 
 export interface StudentEnrollment {
-  studentId: string;
-  courseId: string;
-  enrollmentDate: string;
-  grade?: string;
-  status: 'enrolled' | 'completed' | 'dropped' | 'failed';
+  Stu_ID: number;
+  Crs_ID: number;
+  Grade?: number; // 0-100
+  Year: string; // e.g., '2024-25'
 }

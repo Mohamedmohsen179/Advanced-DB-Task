@@ -12,8 +12,8 @@ export default function CoursesContainer() {
   const [courses, setCourses] = useState<CourseWithSchedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'Level1' | 'Level2' | 'Level3' | 'Level4'>('all');
-  const [semesterFilter, setSemesterFilter] = useState<'all' | 'fall' | 'spring' | 'summer' | 'winter'>('all');
+  const [filter, setFilter] = useState<'all' | '1' | '2' | '3' | '4'>('all');
+  const [deptFilter, setDeptFilter] = useState<'all' | '1' | '2' | '3'>('all');
 
   useEffect(() => {
     loadCourses();
@@ -43,13 +43,13 @@ export default function CoursesContainer() {
     console.log('Edit course:', course);
   };
 
-  const handleDelete = async (courseId: string) => {
+  const handleDelete = async (courseId: number) => {
     if (!confirm('Are you sure you want to delete this course?')) {
       return;
     }
 
     try {
-      await apiService.deleteCourse(courseId);
+      await apiService.deleteCourse(String(courseId));
       // Reload courses after deletion
       await loadCourses();
     } catch (err) {
@@ -59,9 +59,12 @@ export default function CoursesContainer() {
   };
 
   const filteredCourses = courses.filter(course => {
-    const statusMatch = filter === 'all' || course.code === filter;
-    const semesterMatch = semesterFilter === 'all' || course.semester === semesterFilter;
-    return statusMatch && semesterMatch;
+    // Filter by level (check schedules for level)
+    const levelMatch = filter === 'all' || 
+      (course.schedules && course.schedules.some(s => s.Level === parseInt(filter)));
+    // Filter by department
+    const deptMatch = deptFilter === 'all' || course.Dept_ID === parseInt(deptFilter);
+    return levelMatch && deptMatch;
   });
 
   if (error) {
@@ -115,30 +118,29 @@ export default function CoursesContainer() {
               <label className="block text-sm font-semibold text-slate-700 mb-1">Level</label>
               <select
                 value={filter}
-                onChange={(e) => setFilter(e.target.value as 'all' | 'Level1' | 'Level2' | 'Level3' | 'Level4')}
+                onChange={(e) => setFilter(e.target.value as 'all' | '1' | '2' | '3' | '4')}
                 className="border border-slate-300 rounded-lg px-4 py-2.5 text-sm
                 text-black focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
               >
                 <option value="all">All Levels</option>
-                <option value="Level1">Level 1</option>
-                <option value="Level2">Level 2</option>
-                <option value="Level3">Level 3</option>
-                <option value="Level4">Level 4</option>
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Semester</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Department</label>
               <select
-                value={semesterFilter}
-                onChange={(e) => setSemesterFilter(e.target.value as 'all' | 'fall' | 'spring' | 'summer' | 'winter')}
+                value={deptFilter}
+                onChange={(e) => setDeptFilter(e.target.value as 'all' | '1' | '2' | '3')}
                 className="border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-black focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
               >
-                <option value="all">All Semesters</option>
-                <option value="fall">Fall</option>
-                <option value="spring">Spring</option>
-                <option value="summer">Summer</option>
-                <option value="winter">Winter</option>
+                <option value="all">All Departments</option>
+                <option value="1">Computer Science</option>
+                <option value="2">Information Technology</option>
+                <option value="3">Information System</option>
               </select>
             </div>
 
@@ -193,7 +195,7 @@ export default function CoursesContainer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => (
             <CourseCard
-              key={course.id}
+              key={course.Crs_ID}
               course={course}
               onEdit={handleEdit}
               onDelete={handleDelete}

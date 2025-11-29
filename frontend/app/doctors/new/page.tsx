@@ -13,64 +13,28 @@ export default function NewDoctorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<CreateDoctorRequest>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    dateOfBirth: '',
-    employeeId: '',
-    departmentId: '1', // Default to first department
-    title: '',
-    specialization: '',
-    officeLocation: '',
-    officeHours: '',
-    biography: '',
-    qualifications: [],
-    researchInterests: [],
+    Doc_ID: 0,
+    SSN: '',
+    FName: '',
+    LName: '',
+    Email: '',
+    Username: '',
+    Password: '',
+    Hire_Date: new Date().toISOString().split('T')[0],
+    DOB: '',
+    Gender: 'M',
+    Hour_Rate: 100,
+    Hours_Per_Week: 30,
+    Dept_ID: 1,
   });
-
-  const [qualificationInput, setQualificationInput] = useState('');
-  const [researchInput, setResearchInput] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
-    }));
-  };
-
-  const addQualification = () => {
-    if (qualificationInput.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        qualifications: [...prev.qualifications, qualificationInput.trim()],
-      }));
-      setQualificationInput('');
-    }
-  };
-
-  const removeQualification = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      qualifications: prev.qualifications.filter((_, i) => i !== index),
-    }));
-  };
-
-  const addResearchInterest = () => {
-    if (researchInput.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        researchInterests: [...prev.researchInterests, researchInput.trim()],
-      }));
-      setResearchInput('');
-    }
-  };
-
-  const removeResearchInterest = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      researchInterests: prev.researchInterests.filter((_, i) => i !== index),
+      [name]: name === 'Doc_ID' || name === 'Hour_Rate' || name === 'Hours_Per_Week' || name === 'Dept_ID'
+        ? parseInt(value) || 0
+        : value,
     }));
   };
 
@@ -131,159 +95,206 @@ export default function NewDoctorPage() {
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-semibold text-slate-700">
+                <label htmlFor="Doc_ID" className="block text-sm font-semibold text-slate-700">
+                  Doctor ID *
+                </label>
+                <input
+                  type="number"
+                  id="Doc_ID"
+                  name="Doc_ID"
+                  required
+                  value={formData.Doc_ID}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="SSN" className="block text-sm font-medium text-gray-700">
+                  SSN (14 digits) *
+                </label>
+                <input
+                  type="text"
+                  id="SSN"
+                  name="SSN"
+                  required
+                  maxLength={14}
+                  value={formData.SSN}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="FName" className="block text-sm font-semibold text-slate-700">
                   First Name *
                 </label>
                 <input
                   type="text"
-                  id="firstName"
-                  name="firstName"
+                  id="FName"
+                  name="FName"
                   required
-                  value={formData.firstName}
+                  value={formData.FName}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="LName" className="block text-sm font-medium text-gray-700">
                   Last Name *
                 </label>
                 <input
                   type="text"
-                  id="lastName"
-                  name="lastName"
+                  id="LName"
+                  name="LName"
                   required
-                  value={formData.lastName}
+                  value={formData.LName}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="Email" className="block text-sm font-medium text-gray-700">
                   Email *
                 </label>
                 <input
                   type="email"
-                  id="email"
-                  name="email"
+                  id="Email"
+                  name="Email"
                   required
-                  value={formData.email}
+                  value={formData.Email}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="Username" className="block text-sm font-medium text-gray-700">
                   Username *
                 </label>
                 <input
                   type="text"
-                  id="username"
-                  name="username"
+                  id="Username"
+                  name="Username"
                   required
-                  value={formData.username}
+                  value={formData.Username}
                   onChange={handleInputChange}
-                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm 
-           focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 
-           transition-all duration-200 bg-white shadow-sm"
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
-
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="Password" className="block text-sm font-medium text-gray-700">
                   Password *
                 </label>
                 <input
                   type="password"
-                  id="password"
-                  name="password"
+                  id="Password"
+                  name="Password"
                   required
-                  value={formData.password}
+                  value={formData.Password}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="employeeId" className="block text-sm font-medium text-gray-700">
-                  Doctor ID *
-                </label>
-                <input
-                  type="text"
-                  id="employeeId"
-                  name="employeeId"
-                  required
-                  value={formData.employeeId}
-                  onChange={handleInputChange}
-                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="doctorSsn" className="block text-sm font-medium text-gray-700">
-                  Doctor SSN *
-                </label>
-                <input
-                  type="text"
-                  id="doctorSsn"
-                  name="doctorSsn"
-                  required
-                  value={formData.ssn}
-                  onChange={handleInputChange}
-                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="DOB" className="block text-sm font-medium text-gray-700">
                   Date of Birth *
                 </label>
                 <input
                   type="date"
-                  id="dateOfBirth"
-                  name="dateOfBirth"
+                  id="DOB"
+                  name="DOB"
                   required
-                  value={formData.dateOfBirth}
+                  value={formData.DOB}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="Hire_Date" className="block text-sm font-medium text-gray-700">
+                  Hire Date *
+                </label>
+                <input
+                  type="date"
+                  id="Hire_Date"
+                  name="Hire_Date"
+                  required
+                  value={formData.Hire_Date}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="Gender" className="block text-sm font-medium text-gray-700">
+                  Gender *
+                </label>
+                <select
+                  id="Gender"
+                  name="Gender"
+                  required
+                  value={formData.Gender}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="Hour_Rate" className="block text-sm font-medium text-gray-700">
+                  Hourly Rate *
+                </label>
+                <input
+                  type="number"
+                  id="Hour_Rate"
+                  name="Hour_Rate"
+                  required
+                  min="0"
+                  value={formData.Hour_Rate}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="Hours_Per_Week" className="block text-sm font-medium text-gray-700">
+                  Hours Per Week *
+                </label>
+                <input
+                  type="number"
+                  id="Hours_Per_Week"
+                  name="Hours_Per_Week"
+                  required
+                  min="1"
+                  max="168"
+                  value={formData.Hours_Per_Week}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="Dept_ID" className="block text-sm font-medium text-gray-700">
                   Department *
                 </label>
                 <select
-                  id="departmentId"
-                  name="departmentId"
+                  id="Dept_ID"
+                  name="Dept_ID"
                   required
-                  value={formData.departmentId}
+                  value={formData.Dept_ID}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 >
                   <option value="1">Computer Science</option>
-                  <option value="2">Mathematics</option>
+                  <option value="2">Information Technology</option>
+                  <option value="3">Information System</option>
                 </select>
               </div>
             </div>

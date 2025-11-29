@@ -12,8 +12,6 @@ export default function DepartmentsContainer() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-
   useEffect(() => {
     loadDepartments();
   }, []);
@@ -42,13 +40,13 @@ export default function DepartmentsContainer() {
     console.log('Edit department:', department);
   };
 
-  const handleDelete = async (departmentId: string) => {
+  const handleDelete = async (departmentId: number) => {
     if (!confirm('Are you sure you want to delete this department? This action cannot be undone.')) {
       return;
     }
 
     try {
-      await apiService.deleteDepartment(departmentId);
+      await apiService.deleteDepartment(String(departmentId));
       // Reload departments after deletion
       await loadDepartments();
     } catch (err) {
@@ -57,9 +55,7 @@ export default function DepartmentsContainer() {
     }
   };
 
-  const filteredDepartments = departments.filter(dept => {
-    return statusFilter === 'all' || dept.status === statusFilter;
-  });
+  const filteredDepartments = departments;
 
   if (error) {
     return (
@@ -104,27 +100,12 @@ export default function DepartmentsContainer() {
         </Link>
       </div>
 
-      {/* Filters */}
+      {/* Stats */}
       <Card>
         <CardContent>
-          <div className="flex flex-wrap gap-4 items-center">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Status</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-                className="border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-black focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-
-            <div className="flex-1"></div>
-
+          <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-slate-600">
-              Showing {filteredDepartments.length} of {departments.length} departments
+              Showing {filteredDepartments.length} departments
             </div>
           </div>
         </CardContent>
@@ -172,7 +153,7 @@ export default function DepartmentsContainer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDepartments.map((department) => (
             <DepartmentCard
-              key={department.id}
+              key={department.Dept_ID}
               department={department}
               onEdit={handleEdit}
               onDelete={handleDelete}

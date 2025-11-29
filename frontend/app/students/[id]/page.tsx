@@ -99,10 +99,10 @@ export default function StudentDetailsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            {student.firstName} {student.lastName}
+            {student.FName} {student.LName}
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Student ID: {student.studentId}
+            Student ID: {student.Stu_ID}
           </p>
         </div>
         <div className="flex space-x-3">
@@ -124,69 +124,82 @@ export default function StudentDetailsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Full Name</label>
-                  <p className="mt-1 text-sm text-gray-900">{student.firstName} {student.lastName}</p>
+                  <p className="mt-1 text-sm text-gray-900">{student.FName} {student.LName}</p>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Email</label>
-                  <p className="mt-1 text-sm text-gray-900">{student.email}</p>
+                  <p className="mt-1 text-sm text-gray-900">{student.Email}</p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Phone Number</label>
-                  <p className="mt-1 text-sm text-gray-900">{student.phoneNumber || 'Not provided'}</p>
+                  <label className="block text-sm font-medium text-gray-500">SSN</label>
+                  <p className="mt-1 text-sm text-gray-900">{student.Stu_SSN}</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-500">Username</label>
+                  <p className="mt-1 text-sm text-gray-900">{student.Username}</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-500">Phone Number(s)</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {student.phones && student.phones.length > 0 
+                      ? student.phones.map(p => p.Phone_NUM).join(', ')
+                      : 'Not provided'}
+                  </p>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Date of Birth</label>
                   <p className="mt-1 text-sm text-gray-900">
-                    {new Date(student.dateOfBirth).toLocaleDateString()}
+                    {new Date(student.DOB).toLocaleDateString()} {student.Age && `(${student.Age} years old)`}
                   </p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Enrollment Date</label>
-                  <p className="mt-1 text-sm text-gray-900">
-                    {new Date(student.enrollmentDate).toLocaleDateString()}
-                  </p>
+                  <label className="block text-sm font-medium text-gray-500">Gender</label>
+                  <p className="mt-1 text-sm text-gray-900">{student.Gender === 'M' ? 'Male' : 'Female'}</p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-500">Status</label>
+                  <label className="block text-sm font-medium text-gray-500">Level</label>
                   <span className={`mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    student.status === 'active' 
-                      ? 'bg-green-100 text-green-800'
-                      : student.status === 'inactive'
-                      ? 'bg-gray-100 text-gray-800'
-                      : student.status === 'graduated'
+                    student.Level === 4
+                      ? 'bg-purple-100 text-purple-800'
+                      : student.Level === 3
                       ? 'bg-blue-100 text-blue-800'
-                      : 'bg-red-100 text-red-800'
+                      : student.Level === 2
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {student.status}
+                    Level {student.Level}
                   </span>
                 </div>
                 
-                {student.gpa && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500">GPA</label>
-                    <p className="mt-1 text-sm text-gray-900">{student.gpa.toFixed(2)}</p>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-500">CGPA</label>
+                  <p className="mt-1 text-sm text-gray-900">{student.CGPA.toFixed(2)}</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-500">Department</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {student.Dept_ID === 1 ? 'Computer Science' : student.Dept_ID === 2 ? 'Information Technology' : 'Information System'}
+                  </p>
+                </div>
               </div>
               
-              {student.address && (
+              {student.addresses && student.addresses.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-md font-medium text-gray-900 mb-4">Address</h3>
-                  <div className="text-sm text-gray-900">
-                    {student.address.street && <p>{student.address.street}</p>}
-                    {(student.address.city || student.address.state || student.address.zipCode) && (
-                      <p>
-                        {student.address.city}
-                        {student.address.city && student.address.state && ', '}
-                        {student.address.state} {student.address.zipCode}
-                      </p>
-                    )}
-                    {student.address.country && <p>{student.address.country}</p>}
+                  <h3 className="text-md font-medium text-gray-900 mb-4">Address(es)</h3>
+                  <div className="space-y-2">
+                    {student.addresses.map((addr, idx) => (
+                      <div key={idx} className="text-sm text-gray-900">
+                        <p>{addr.Street}, {addr.City}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -207,18 +220,19 @@ export default function StudentDetailsPage() {
                   <span className="text-lg font-semibold text-gray-900">{courses.length}</span>
                 </div>
                 
-                {student.gpa && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Current GPA</span>
-                    <span className="text-lg font-semibold text-gray-900">{student.gpa.toFixed(2)}</span>
-                  </div>
-                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Current CGPA</span>
+                  <span className="text-lg font-semibold text-gray-900">{student.CGPA.toFixed(2)}</span>
+                </div>
                 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Years Enrolled</span>
-                  <span className="text-lg font-semibold text-gray-900">
-                    {Math.floor((new Date().getTime() - new Date(student.enrollmentDate).getTime()) / (1000 * 60 * 60 * 24 * 365))}
-                  </span>
+                  <span className="text-sm text-gray-500">Level</span>
+                  <span className="text-lg font-semibold text-gray-900">Level {student.Level}</span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Age</span>
+                  <span className="text-lg font-semibold text-gray-900">{student.Age || 'N/A'}</span>
                 </div>
               </div>
             </CardContent>
@@ -250,33 +264,31 @@ export default function StudentDetailsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {courses.map((course) => (
-                <div key={course.id} className="border border-gray-200 rounded-lg p-4">
+                <div key={course.Crs_ID} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">{course.name}</h3>
-                      <p className="text-sm text-gray-500">{course.code}</p>
-                      <p className="text-sm text-gray-600 mt-1">{course.credits} Credits</p>
+                      <h3 className="font-medium text-gray-900">{course.Crs_Name}</h3>
+                      <p className="text-sm text-gray-500">Course ID: {course.Crs_ID}</p>
+                      <p className="text-sm text-gray-600 mt-1">{course.Credit_Hours} Credit Hours</p>
                       {course.instructor && (
                         <p className="text-sm text-gray-600">
-                          Instructor: {course.instructor.firstName} {course.instructor.lastName}
+                          Instructor: Dr. {course.instructor.FName} {course.instructor.LName}
+                        </p>
+                      )}
+                      {course.department && (
+                        <p className="text-sm text-gray-600">
+                          Department: {course.department.Dept_Name}
                         </p>
                       )}
                     </div>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      course.status === 'active' 
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {course.status}
-                    </span>
                   </div>
                   
                   {course.schedules && course.schedules.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-gray-100">
                       <p className="text-xs font-medium text-gray-500 mb-1">Schedule:</p>
                       {course.schedules.map((schedule) => (
-                        <p key={schedule.id} className="text-xs text-gray-600">
-                          {schedule.dayOfWeek.charAt(0).toUpperCase() + schedule.dayOfWeek.slice(1)} {schedule.startTime} - {schedule.endTime}
+                        <p key={schedule.Sch_ID} className="text-xs text-gray-600">
+                          {schedule.Day} {schedule.Start_Hour} - {schedule.END_Hour} ({schedule.Location})
                         </p>
                       ))}
                     </div>

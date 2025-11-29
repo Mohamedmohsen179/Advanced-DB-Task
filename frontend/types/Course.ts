@@ -1,67 +1,61 @@
+// Course interface matching Faculty_System database schema
 export interface Course {
-  id: string;
-  name: string;
-  code: string;
-  description?: string;
-  credits: number;
-  departmentId: string;
-  instructorId: string;
-  semester: 'fall' | 'spring' | 'summer' | 'winter';
-  year: number;
-  maxStudents: number;
-  enrolledStudents: number;
-  prerequisites?: string[];
-  syllabus?: string;
-  status: 'active' | 'inactive' | 'cancelled';
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  updatedAt: string;
+  Crs_ID: number;
+  Crs_Name: string;
+  Discription: string;
+  Credit_Hours: number;
+  Doc_ID: number;
+  Dept_ID: number;
+  Max_Num_Stu?: number;
+  // Related data
+  schedules?: CourseSchedule[];
+  instructor?: {
+    Doc_ID: number;
+    FName: string;
+    LName: string;
+    Email: string;
+  };
+  department?: {
+    Dept_ID: number;
+    Dept_Name: string;
+    Dept_Code?: string;
+  };
 }
 
 export interface CreateCourseRequest {
-  name: string;
-  code: string;
-  description?: string;
-  credits: number;
-  departmentId: string;
-  instructorId: string;
-  semester: 'fall' | 'spring' | 'summer' | 'winter';
-  year: number;
-  maxStudents: number;
-  prerequisites?: string[];
-  syllabus?: string;
-  startDate: string;
-  endDate: string;
+  Crs_Name: string;
+  Discription: string;
+  Credit_Hours: number;
+  Doc_ID: number;
+  Dept_ID: number;
+  Max_Num_Stu?: number;
 }
 
-export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
-  status?: 'active' | 'inactive' | 'cancelled';
-}
+export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {}
 
 export interface CourseSchedule {
-  id: string;
-  courseId: string;
-  dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
-  startTime: string;
-  endTime: string;
-  location: string;
-  roomNumber?: string;
-  building?: string;
-  scheduleType: 'lecture' | 'lab' | 'tutorial' | 'seminar';
+  Sch_ID: number;
+  Crs_ID: number;
+  Day: 'Saturday' | 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday';
+  Start_Hour: string; // time format
+  END_Hour: string; // time format
+  Level: 1 | 2 | 3 | 4;
+  Location?: string;
+}
+
+export interface Enrollment {
+  Stu_ID: number;
+  Crs_ID: number;
+  Grade?: number; // 0-100
+  Year: string; // e.g., '2024-25'
+}
+
+export interface Teach {
+  Crs_ID: number;
+  Doc_ID: number;
+  Semester: string;
 }
 
 export interface CourseWithSchedule extends Course {
   schedules: CourseSchedule[];
-  instructor?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  department?: {
-    id: string;
-    name: string;
-    code: string;
-  };
 }

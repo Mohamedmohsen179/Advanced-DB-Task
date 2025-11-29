@@ -38,13 +38,13 @@ export default function DoctorsContainer() {
     console.log('Edit doctor:', doctor);
   };
 
-  const handleDelete = async (doctorId: string) => {
+  const handleDelete = async (doctorId: number) => {
     if (!confirm('Are you sure you want to delete this doctor?')) {
       return;
     }
 
     try {
-      await apiService.deleteDoctor(doctorId);
+      await apiService.deleteDoctor(String(doctorId));
       // Reload doctors after deletion
       await loadDoctors();
     } catch (err) {

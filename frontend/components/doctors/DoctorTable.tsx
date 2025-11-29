@@ -9,7 +9,7 @@ interface DoctorTableProps {
   doctors: Doctor[];
   loading?: boolean;
   onEdit?: (doctor: Doctor) => void;
-  onDelete?: (doctorId: string) => void;
+  onDelete?: (doctorId: number) => void;
 }
 
 export default function DoctorTable({
@@ -95,57 +95,55 @@ export default function DoctorTable({
 
             <tbody className="bg-white divide-y divide-slate-200">
               {doctors.map((doctor) => (
-                <tr key={doctor.id} className="hover:bg-slate-50 transition-colors duration-150">
+                <tr key={doctor.Doc_ID} className="hover:bg-slate-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-11 w-11">
                         <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
                           <span className="text-white font-semibold text-sm">
-                            {doctor.firstName.charAt(0)}{doctor.lastName.charAt(0)}
+                            {doctor.FName.charAt(0)}{doctor.LName.charAt(0)}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-semibold text-slate-900">
-                          {doctor.firstName} {doctor.lastName}
+                          {doctor.FName} {doctor.LName}
                         </div>
                         <div className="text-sm text-slate-500">
-                          {doctor.email}
+                          {doctor.Email}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {doctor.employeeId}
+                    {doctor.Doc_ID}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{doctor.title}</div>
-                    <div className="text-sm text-gray-500">{doctor.specialization || 'General'}</div>
+                    <div className="text-sm text-gray-900">
+                      {doctor.Dept_ID === 1 ? 'Computer Science' : doctor.Dept_ID === 2 ? 'Information Technology' : 'Information System'}
+                    </div>
+                    <div className="text-sm text-gray-500">{doctor.Gender === 'M' ? 'Male' : 'Female'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{doctor.officeLocation || 'Not assigned'}</div>
-                    <div className="text-sm text-gray-500">{doctor.officeHours || 'Not set'}</div>
+                    <div className="text-sm text-gray-900">{doctor.Username}</div>
+                    <div className="text-sm text-gray-500">SSN: {doctor.SSN}</div>
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(doctor.hireDate).toLocaleDateString()}
+                    {new Date(doctor.Hire_Date).toLocaleDateString()}
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${doctor.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : doctor.status === 'inactive'
-                        ? 'bg-gray-100 text-gray-800'
-                        : doctor.status === 'on_leave'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                      {doctor.status.replace('_', ' ')}
-                    </span>
+                    <div className="text-sm text-gray-900">
+                      {doctor.phones && doctor.phones.length > 0 ? doctor.phones[0].Phone_NUM : 'No phone'}
+                    </div>
+                    {doctor.phones && doctor.phones.length > 1 && (
+                      <div className="text-xs text-gray-500">+{doctor.phones.length - 1} more</div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                     <Link
-                      href={`/doctors/${doctor.id}`}
+                      href={`/doctors/${doctor.Doc_ID}`}
                       className="text-blue-600 hover:text-blue-900"
                     >
                       View
@@ -161,7 +159,7 @@ export default function DoctorTable({
                     )}
                     {onDelete && (
                       <button
-                        onClick={() => onDelete(doctor.id)}
+                        onClick={() => onDelete(doctor.Doc_ID)}
                         className="text-red-600 hover:text-red-900"
                       >
                         Delete

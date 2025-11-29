@@ -11,18 +11,16 @@ export default function NewDepartmentPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [doctors, setDoctors] = useState<{ Doc_ID: number; FName: string; LName: string }[]>([]);
 
   const [formData, setFormData] = useState<CreateDepartmentRequest>({
-    name: '',
-    code: '',
-    description: '',
-    headOfDepartmentId: '',
-    establishedDate: new Date().toISOString().split('T')[0],
-    location: '',
-    phoneNumber: '',
-    email: '',
-    website: ''
+    Dept_ID: 0,
+    Dept_Name: '',
+    Doc_ID: 0,
+    Establish_Date: new Date().toISOString().split('T')[0],
+    Location: '',
+    Dept_Description: '',
+    Dept_Code: ''
   });
 
   useEffect(() => {
@@ -33,7 +31,7 @@ export default function NewDepartmentPage() {
     try {
       const response = await apiService.getDoctors();
       if (response.success) {
-        setDoctors(response.data.map(d => ({ id: d.id, firstName: d.firstName, lastName: d.lastName })));
+        setDoctors(response.data.map(d => ({ Doc_ID: d.Doc_ID, FName: d.FName, LName: d.LName })));
       }
     } catch (err) {
       console.error('Error loading doctors:', err);
@@ -41,6 +39,11 @@ export default function NewDepartmentPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'Doc_ID' || name === 'Dept_ID' ? parseInt(value) || 0 : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,73 +102,87 @@ export default function NewDepartmentPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-slate-700">
-                  Department Name *
+                <label htmlFor="Dept_ID" className="block text-sm font-semibold text-slate-700">
+                  Department ID *
                 </label>
                 <input
-                  type="text"
-                  id="name"
-                  name="name"
+                  type="number"
+                  id="Dept_ID"
+                  name="Dept_ID"
                   required
-                  value={formData.name}
+                  value={formData.Dept_ID}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="code" className="block text-sm font-semibold text-slate-700">
-                  Department Code *
+                <label htmlFor="Dept_Name" className="block text-sm font-semibold text-slate-700">
+                  Department Name *
                 </label>
                 <input
                   type="text"
-                  id="code"
-                  name="code"
+                  id="Dept_Name"
+                  name="Dept_Name"
                   required
-                  value={formData.code}
+                  value={formData.Dept_Name}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="Dept_Code" className="block text-sm font-semibold text-slate-700">
+                  Department Code
+                </label>
+                <input
+                  type="text"
+                  id="Dept_Code"
+                  name="Dept_Code"
+                  value={formData.Dept_Code}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="Establish_Date" className="block text-sm font-semibold text-slate-700">
+                  Established Date *
+                </label>
+                <input
+                  type="date"
+                  id="Establish_Date"
+                  name="Establish_Date"
+                  required
+                  value={formData.Establish_Date}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="description" className="block text-sm font-semibold text-slate-700">
+                <label htmlFor="Dept_Description" className="block text-sm font-semibold text-slate-700">
                   Description
                 </label>
                 <textarea
-                  id="description"
-                  name="description"
+                  id="Dept_Description"
+                  name="Dept_Description"
                   rows={3}
-                  value={formData.description}
+                  value={formData.Dept_Description}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="establishedDate" className="block text-sm font-semibold text-slate-700">
-                  Established Date *
-                </label>
-                <input
-                  type="date"
-                  id="establishedDate"
-                  name="establishedDate"
-                  required
-                  value={formData.establishedDate}
-                  onChange={handleInputChange}
-                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="location" className="block text-sm font-semibold text-slate-700">
+                <label htmlFor="Location" className="block text-sm font-semibold text-slate-700">
                   Location
                 </label>
                 <input
                   type="text"
-                  id="location"
-                  name="location"
-                  value={formData.location}
+                  id="Location"
+                  name="Location"
+                  value={formData.Location}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
@@ -173,20 +190,21 @@ export default function NewDepartmentPage() {
             </div>
 
             <div>
-              <label htmlFor="headOfDepartmentId" className="block text-sm font-semibold text-slate-700">
-                Head of Department
+              <label htmlFor="Doc_ID" className="block text-sm font-semibold text-slate-700">
+                Head of Department (Doctor) *
               </label>
               <select
-                id="headOfDepartmentId"
-                name="headOfDepartmentId"
-                value={formData.headOfDepartmentId || ''}
+                id="Doc_ID"
+                name="Doc_ID"
+                required
+                value={formData.Doc_ID || ''}
                 onChange={handleInputChange}
                 className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
               >
                 <option value="">Select Head of Department</option>
                 {doctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>
-                    Dr. {doctor.firstName} {doctor.lastName}
+                  <option key={doctor.Doc_ID} value={doctor.Doc_ID}>
+                    Dr. {doctor.FName} {doctor.LName}
                   </option>
                 ))}
               </select>

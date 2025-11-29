@@ -1,35 +1,29 @@
+// Department interface matching Faculty_System database schema
 export interface Department {
-  id: string;
-  name: string;
-  code: string;
-  description?: string;
-  headOfDepartmentId?: string;
-  establishedDate: string;
-  location?: string;
-  phoneNumber?: string;
-  email?: string;
-  website?: string;
-  budget?: number;
-  studentCount: number;
-  facultyCount: number;
-  status: 'active' | 'inactive';
-  createdAt: string;
-  updatedAt: string;
+  Dept_ID: number;
+  Dept_Name: string;
+  Doc_ID: number; // Head of department (Doctor ID)
+  Establish_Date: string;
+  Location?: string;
+  Dept_Description?: string;
+  Dept_Code?: string;
+  // Related data
+  headDoctor?: {
+    Doc_ID: number;
+    FName: string;
+    LName: string;
+    Email: string;
+  };
 }
 
 export interface CreateDepartmentRequest {
-  name: string;
-  code: string;
-  description?: string;
-  headOfDepartmentId?: string;
-  establishedDate: string;
-  location?: string;
-  phoneNumber?: string;
-  email?: string;
-  website?: string;
-  budget?: number;
+  Dept_ID: number;
+  Dept_Name: string;
+  Doc_ID: number;
+  Establish_Date: string;
+  Location?: string;
+  Dept_Description?: string;
+  Dept_Code?: string;
 }
 
-export interface UpdateDepartmentRequest extends Partial<CreateDepartmentRequest> {
-  status?: 'active' | 'inactive';
-}
+export interface UpdateDepartmentRequest extends Partial<CreateDepartmentRequest> {}

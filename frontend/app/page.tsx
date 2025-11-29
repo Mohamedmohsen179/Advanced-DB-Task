@@ -37,7 +37,7 @@ export default function Home() {
           studentsCount: studentsResponse.data.length,
           doctorsCount: doctorsResponse.data.length,
           coursesCount: coursesResponse.data.length,
-          activeCoursesCount: coursesResponse.data.filter((course: CourseWithSchedule) => course.status === 'active').length,
+          activeCoursesCount: coursesResponse.data.filter((course: CourseWithSchedule) => course.schedules && course.schedules.length > 0).length,
         });
 
         // Get recent students (last 3)
@@ -202,30 +202,30 @@ export default function Home() {
           <CardContent>
             <div className="space-y-4">
               {recentStudents.map((student) => (
-                <div key={student.id} className="flex items-center justify-between">
+                <div key={student.Stu_ID} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10">
                       <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                         <span className="text-blue-600 font-medium text-sm">
-                          {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                          {student.FName.charAt(0)}{student.LName.charAt(0)}
                         </span>
                       </div>
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {student.firstName} {student.lastName}
+                        {student.FName} {student.LName}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {student.email} • {student.studentId}
+                        {student.Email} • ID: {student.Stu_ID}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm text-gray-900">
-                      {student.gpa ? `GPA: ${student.gpa.toFixed(2)}` : 'No GPA'}
+                      CGPA: {student.CGPA.toFixed(2)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      Enrolled: {new Date(student.enrollmentDate).toLocaleDateString()}
+                      Level {student.Level} • {student.Gender === 'M' ? 'Male' : 'Female'}
                     </div>
                   </div>
                 </div>

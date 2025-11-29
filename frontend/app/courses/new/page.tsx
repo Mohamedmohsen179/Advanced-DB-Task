@@ -11,26 +11,17 @@ export default function NewCoursePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<{ id: string; name: string; code: string }[]>([]);
-  const [doctors, setDoctors] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [departments, setDepartments] = useState<{ Dept_ID: number; Dept_Name: string; Dept_Code: string }[]>([]);
+  const [doctors, setDoctors] = useState<{ Doc_ID: number; FName: string; LName: string }[]>([]);
 
   const [formData, setFormData] = useState<CreateCourseRequest>({
-    name: '',
-    code: '',
-    description: '',
-    credits: 3,
-    departmentId: '',
-    instructorId: '',
-    semester: 'fall',
-    year: new Date().getFullYear(),
-    maxStudents: 30,
-    prerequisites: [],
-    syllabus: '',
-    startDate: '',
-    endDate: '',
+    Crs_Name: '',
+    Discription: '',
+    Credit_Hours: 3,
+    Doc_ID: 0,
+    Dept_ID: 0,
+    Max_Num_Stu: 30,
   });
-
-  const [prerequisiteInput, setPrerequisiteInput] = useState('');
 
   useEffect(() => {
     loadDepartments();
@@ -41,9 +32,9 @@ export default function NewCoursePage() {
     try {
       const response = await apiService.getDepartments();
       if (response.success && response.data.length > 0) {
-        setDepartments(response.data.map(d => ({ id: d.id, name: d.name, code: d.code })));
-        if (!formData.departmentId) {
-          setFormData(prev => ({ ...prev, departmentId: response.data[0].id }));
+        setDepartments(response.data.map(d => ({ Dept_ID: d.Dept_ID, Dept_Name: d.Dept_Name, Dept_Code: d.Dept_Code || '' })));
+        if (!formData.Dept_ID) {
+          setFormData(prev => ({ ...prev, Dept_ID: response.data[0].Dept_ID }));
         }
       }
     } catch (err) {
@@ -55,9 +46,9 @@ export default function NewCoursePage() {
     try {
       const response = await apiService.getDoctors();
       if (response.success && response.data.length > 0) {
-        setDoctors(response.data.map(d => ({ id: d.id, firstName: d.firstName, lastName: d.lastName })));
-        if (!formData.instructorId) {
-          setFormData(prev => ({ ...prev, instructorId: response.data[0].id }));
+        setDoctors(response.data.map(d => ({ Doc_ID: d.Doc_ID, FName: d.FName, LName: d.LName })));
+        if (!formData.Doc_ID) {
+          setFormData(prev => ({ ...prev, Doc_ID: response.data[0].Doc_ID }));
         }
       }
     } catch (err) {
@@ -69,26 +60,9 @@ export default function NewCoursePage() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'credits' || name === 'year' || name === 'maxStudents'
+      [name]: name === 'Credit_Hours' || name === 'Max_Num_Stu' || name === 'Doc_ID' || name === 'Dept_ID'
         ? parseInt(value) || 0
         : value,
-    }));
-  };
-
-  const addPrerequisite = () => {
-    if (prerequisiteInput.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        prerequisites: [...(prev.prerequisites || []), prerequisiteInput.trim()],
-      }));
-      setPrerequisiteInput('');
-    }
-  };
-
-  const removePrerequisite = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      prerequisites: prev.prerequisites?.filter((_, i) => i !== index) || [],
     }));
   };
 
@@ -148,77 +122,103 @@ export default function NewCoursePage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-slate-700">
+                <label htmlFor="Crs_Name" className="block text-sm font-semibold text-slate-700">
                   Course Name *
                 </label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
+                  id="Crs_Name"
+                  name="Crs_Name"
                   required
-                  value={formData.name}
+                  value={formData.Crs_Name}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="code" className="block text-sm font-semibold text-slate-700">
-                  Course Departement *
+                <label htmlFor="Credit_Hours" className="block text-sm font-semibold text-slate-700">
+                  Credit Hours *
                 </label>
                 <input
-                  type="text"
-                  id="code"
-                  name="code"
+                  type="number"
+                  id="Credit_Hours"
+                  name="Credit_Hours"
                   required
-                  value={formData.code}
+                  min="1"
+                  max="6"
+                  value={formData.Credit_Hours}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="description" className="block text-sm font-semibold text-slate-700">
+                <label htmlFor="Discription" className="block text-sm font-semibold text-slate-700">
                   Description
                 </label>
                 <textarea
-                  id="description"
-                  name="description"
+                  id="Discription"
+                  name="Discription"
                   rows={3}
-                  value={formData.description}
+                  value={formData.Discription}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="credits" className="block text-sm font-semibold text-slate-700">
-                  Credit Hours *
+                <label htmlFor="Dept_ID" className="block text-sm font-semibold text-slate-700">
+                  Department *
                 </label>
-                <input
-                  type="number"
-                  id="credits"
-                  name="credits"
+                <select
+                  id="Dept_ID"
+                  name="Dept_ID"
                   required
-                  min="1"
-                  max="6"
-                  value={formData.credits}
+                  value={formData.Dept_ID}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
-                />
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(dept => (
+                    <option key={dept.Dept_ID} value={dept.Dept_ID}>
+                      {dept.Dept_Name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <label htmlFor="maxStudents" className="block text-sm font-semibold text-slate-700">
-                  Max Students *
+                <label htmlFor="Doc_ID" className="block text-sm font-semibold text-slate-700">
+                  Instructor (Doctor) *
+                </label>
+                <select
+                  id="Doc_ID"
+                  name="Doc_ID"
+                  required
+                  value={formData.Doc_ID}
+                  onChange={handleInputChange}
+                  className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
+                >
+                  <option value="">Select Instructor</option>
+                  {doctors.map(doc => (
+                    <option key={doc.Doc_ID} value={doc.Doc_ID}>
+                      Dr. {doc.FName} {doc.LName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="Max_Num_Stu" className="block text-sm font-semibold text-slate-700">
+                  Max Students
                 </label>
                 <input
                   type="number"
-                  id="maxStudents"
-                  name="maxStudents"
-                  required
+                  id="Max_Num_Stu"
+                  name="Max_Num_Stu"
                   min="1"
-                  value={formData.maxStudents}
+                  value={formData.Max_Num_Stu}
                   onChange={handleInputChange}
                   className="text-black mt-1 block w-full border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200 bg-white shadow-sm"
                 />

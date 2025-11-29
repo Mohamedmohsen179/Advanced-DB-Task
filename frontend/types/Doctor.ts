@@ -1,44 +1,51 @@
+// Doctor interface matching Faculty_System database schema
 export interface Doctor {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber?: string;
-  dateOfBirth: string;
-  hireDate: string;
-  employeeId: string;
-  departmentId: string;
-  title: string;
-  specialization?: string;
-  officeLocation?: string;
-  officeHours?: string;
-  biography?: string;
-  qualifications: string[];
-  researchInterests?: string[];
-  status: 'active' | 'inactive' | 'on_leave' | 'retired';
-  salary?: number;
-  createdAt: string;
-  updatedAt: string;
+  Doc_ID: number;
+  SSN: string;
+  FName: string;
+  LName: string;
+  Email: string;
+  Username: string;
+  Password: string;
+  Hire_Date: string;
+  DOB: string;
+  Age?: number; // Computed field
+  Gender: 'M' | 'F';
+  Hour_Rate: number;
+  Hours_Per_Week: number;
+  Salary?: number; // Computed field: Hour_Rate * Hours_Per_Week * 4
+  Dept_ID: number;
+  // Related data
+  phones?: DoctorPhone[];
+  addresses?: DoctorAddress[];
+  courses?: number[]; // Course IDs
+}
+
+export interface DoctorPhone {
+  Doc_ID: number;
+  Phone_NUM: string;
+}
+
+export interface DoctorAddress {
+  Doc_ID: number;
+  City: string;
+  Street: string;
 }
 
 export interface CreateDoctorRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber?: string;
-  dateOfBirth: string;
-  employeeId: string;
-  departmentId: string;
-  title: string;
-  specialization?: string;
-  officeLocation?: string;
-  officeHours?: string;
-  biography?: string;
-  qualifications: string[];
-  researchInterests?: string[];
+  Doc_ID: number;
+  SSN: string;
+  FName: string;
+  LName: string;
+  Email: string;
+  Username: string;
+  Password: string;
+  Hire_Date: string;
+  DOB: string;
+  Gender: 'M' | 'F';
+  Hour_Rate: number;
+  Hours_Per_Week: number;
+  Dept_ID: number;
 }
 
-export interface UpdateDoctorRequest extends Partial<CreateDoctorRequest> {
-  status?: 'active' | 'inactive' | 'on_leave' | 'retired';
-  salary?: number;
-}
+export interface UpdateDoctorRequest extends Partial<CreateDoctorRequest> {}

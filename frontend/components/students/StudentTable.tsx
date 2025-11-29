@@ -9,7 +9,7 @@ interface StudentTableProps {
   students: Student[];
   loading?: boolean;
   onEdit?: (student: Student) => void;
-  onDelete?: (studentId: string) => void;
+  onDelete?: (studentId: number) => void;
 }
 
 export default function StudentTable({
@@ -89,54 +89,55 @@ export default function StudentTable({
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
               {students.map((student) => (
-                <tr key={student.id} className="hover:bg-slate-50 transition-colors duration-150">
+                <tr key={student.Stu_ID} className="hover:bg-slate-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-11 w-11">
                         <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
                           <span className="text-white font-semibold text-sm">
-                            {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                            {student.FName.charAt(0)}{student.LName.charAt(0)}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-semibold text-slate-900">
-                          {student.firstName} {student.lastName}
+                          {student.FName} {student.LName}
                         </div>
                         <div className="text-sm text-slate-500">
-                          {student.phoneNumber || 'No phone'}
+                          {student.phones && student.phones.length > 0 ? student.phones[0].Phone_NUM : 'No phone'}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                    {student.studentId}
+                    {student.Stu_ID}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${student.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : student.status === 'inactive'
-                        ? 'bg-gray-100 text-gray-800'
-                        : student.status === 'graduated'
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      student.Level === 4
+                        ? 'bg-purple-100 text-purple-800'
+                        : student.Level === 3
                           ? 'bg-blue-100 text-blue-800'
-                          : 'bg-red-100 text-red-800'
+                          : student.Level === 2
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
                       }`}>
-                      {student.status}
+                      Level {student.Level}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {new Date(student.enrollmentDate).toLocaleDateString()}
+                    {student.Dept_ID === 1 ? 'Computer Science' : student.Dept_ID === 2 ? 'Information Technology' : 'Information System'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {student.email}
+                    {student.Email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                    {student.gpa ? student.gpa.toFixed(2) : 'N/A'}
+                    {student.CGPA.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-3">
                       <Link
-                        href={`/students/${student.id}`}
+                        href={`/students/${student.Stu_ID}`}
                         className="text-slate-600 hover:text-slate-900 font-semibold transition-colors duration-200"
                       >
                         View
@@ -151,7 +152,7 @@ export default function StudentTable({
                       )}
                       {onDelete && (
                         <button
-                          onClick={() => onDelete(student.id)}
+                          onClick={() => onDelete(student.Stu_ID)}
                           className="text-red-600 hover:text-red-800 font-semibold transition-colors duration-200"
                         >
                           Delete

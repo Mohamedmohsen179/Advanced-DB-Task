@@ -38,13 +38,13 @@ export default function StudentsContainer() {
     console.log('Edit student:', student);
   };
 
-  const handleDelete = async (studentId: string) => {
+  const handleDelete = async (studentId: number) => {
     if (!confirm('Are you sure you want to delete this student?')) {
       return;
     }
 
     try {
-      await apiService.deleteStudent(studentId);
+      await apiService.deleteStudent(String(studentId));
       // Reload students after deletion
       await loadStudents();
     } catch (err) {
